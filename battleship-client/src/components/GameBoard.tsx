@@ -12,20 +12,27 @@ interface GameBoardProps {
 }
 
 function GameBoard({ isOpponent, isSetup = false, cells, setCells, onCellClick }: GameBoardProps) {
-    const { selectedShip, horizontal } = useGame();
+    const { selectedShip, horizontal, setLastResult } = useGame();
     const [hoveredCell, setHoveredCell] = useState<{ x: number, y: number } | null>(null);
 
     useEffect(() => {
         const eventName = isOpponent ? "ShotFired" : "IncomingShot";
 
-        connection.on(eventName, (x: number, y: number, isHit: boolean) => {
-            setCells(prev => {
-                const newCells = prev.map(row => row.map(cell => ({ ...cell })));
-                newCells[y][x].isHit = true;
-                newCells[y][x].isShipHit = isHit;
-                return newCells;
-            });
-        });
+connection.on(eventName, (x: number, y: number, isHit: boolean) => {
+    setCells(prev => {
+        const newCells = prev.map(row => row.map(cell => ({ ...cell })));
+        newCells[y][x].isHit = true;
+        newCells[y][x].isShipHit = isHit;
+        return newCells;
+    });
+
+    if (isOpponent) {
+        setLastResult(`You fired at ${x}, ${y}\n${isHit ? "Hit!" : "Miss!"}`);
+    } else {
+        setLastResult(`Opponent fired at ${x}, ${y}\n${isHit ? "They hit your ship!" : "They missed!"}`);
+    }
+    setTimeout(() => setLastResult(null), 2000);
+});
 
         return () => {
             connection.off(eventName);

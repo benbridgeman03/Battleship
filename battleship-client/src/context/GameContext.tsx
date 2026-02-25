@@ -17,6 +17,8 @@ interface GameContextType {
     horizontal: boolean;
     setHorizontal: React.Dispatch<React.SetStateAction<boolean>>;
     connection: typeof connection;
+    lastResult: string | null;
+    setLastResult: (s: string | null) => void;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -33,6 +35,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const [isMyTurn, setIsMyTurn] = useState(false);
     const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
     const [horizontal, setHorizontal] = useState(true);
+    const [lastResult, setLastResult] = useState<string | null>(null);
     const [myBoard, setMyBoard] = useState<Cell[][]>(
         Array(10).fill(null).map(() =>
             Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
@@ -72,7 +75,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             isMyTurn,
             selectedShip, setSelectedShip,
             horizontal, setHorizontal,
-            connection
+            connection,
+            lastResult, setLastResult
         }}>
             {children}
         </GameContext.Provider>
