@@ -17,8 +17,8 @@ interface GameContextType {
     horizontal: boolean;
     setHorizontal: React.Dispatch<React.SetStateAction<boolean>>;
     connection: typeof connection;
-    lastResult: string | null;
-    setLastResult: (s: string | null) => void;
+    message: { text: string; highlight?: string; color?: string } | null;
+    showMessage: ( text: string, highlight?: string, color?: string ) => void;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -35,7 +35,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const [isMyTurn, setIsMyTurn] = useState(false);
     const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
     const [horizontal, setHorizontal] = useState(true);
-    const [lastResult, setLastResult] = useState<string | null>(null);
+    const [message, setMessage] = useState<{ text: string, highlight?: string, color?: string } | null>(null);
     const [myBoard, setMyBoard] = useState<Cell[][]>(
         Array(10).fill(null).map(() =>
             Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
@@ -46,6 +46,11 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
         )
     );
+
+    function showMessage(text: string, highlight?: string, color?: string, duration: number = 2000) {
+        setMessage({ text, highlight, color });
+        setTimeout(() => setMessage(null), duration);
+    }
 
     useEffect(() => {
         if (!started.current) {
@@ -76,7 +81,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             selectedShip, setSelectedShip,
             horizontal, setHorizontal,
             connection,
-            lastResult, setLastResult
+            message, showMessage
         }}>
             {children}
         </GameContext.Provider>

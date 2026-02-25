@@ -5,5 +5,6 @@
         public string? ConnectionId { get; set; }
         public bool IsReady { get; set; } = false;
         public string?[,] Board { get; set; } = new string?[10, 10];
+        public List<Ship>? Ships { get; set; }
     }
 }

@@ -12,34 +12,45 @@ interface GameBoardProps {
 }
 
 function GameBoard({ isOpponent, isSetup = false, cells, setCells, onCellClick }: GameBoardProps) {
-    const { selectedShip, horizontal, setLastResult } = useGame();
+    const { selectedShip, horizontal, showMessage } = useGame();
     const [hoveredCell, setHoveredCell] = useState<{ x: number, y: number } | null>(null);
 
     useEffect(() => {
         const eventName = isOpponent ? "ShotFired" : "IncomingShot";
 
-connection.on(eventName, (x: number, y: number, isHit: boolean) => {
-    setCells(prev => {
-        const newCells = prev.map(row => row.map(cell => ({ ...cell })));
-        newCells[y][x].isHit = true;
-        newCells[y][x].isShipHit = isHit;
-        return newCells;
-    });
+    connection.on(eventName, (x: number, y: number, isHit: boolean, hitShipName: string, isSunk: boolean) => {
+        setCells(prev => {
+            const newCells = prev.map(row => row.map(cell => ({ ...cell })));
+            newCells[y][x].isHit = true;
+            newCells[y][x].isShipHit = isHit;
+            return newCells;
+        });
 
-    if (isOpponent) {
-        setLastResult(`You fired at ${x}, ${y}\n${isHit ? "Hit!" : "Miss!"}`);
-    } else {
-        setLastResult(`Opponent fired at ${x}, ${y}\n${isHit ? "They hit your ship!" : "They missed!"}`);
-    }
-    setTimeout(() => setLastResult(null), 2000);
-});
+        if (isOpponent) {
+            if (isSunk) {
+                showMessage(`You fired at ${x}, ${y}`, `Sunk their ${hitShipName}!`, "red");
+            } else {
+                showMessage(`You fired at ${x}, ${y}`, isHit ? `Hit their ${hitShipName}!` : "Miss!", isHit ? "red" : "green");
+            }
+        } else {
+            if (isSunk) {
+                showMessage(`Opponent fired at ${x}, ${y}`, `Your ${hitShipName} was sunk!`, "red");
+            } else {
+                showMessage(`Opponent fired at ${x}, ${y}`, isHit ? `They hit your ${hitShipName}!` : "They missed!", isHit ? "red" : "green");
+            }
+        }
+    });
 
         return () => {
             connection.off(eventName);
         };
     }, [isOpponent, setCells]);
 
-    function handleClick(x: number, y: number) {
+    function handleClick(x: number, y: number, cell: Cell) {
+        if(cell.isHit){
+            showMessage("This cell has already been targeted!");
+            return;
+        }
         if (isSetup && !isOpponent) {
             onCellClick?.(x, y);
             return;
@@ -84,7 +95,7 @@ function getCellColor(cell: Cell, isOpponent: boolean, x: number, y: number): st
                         onMouseEnter={() => setHoveredCell({ x, y })}
                         onMouseLeave={() => setHoveredCell(null)}
                         key={`${x}-${y}`}
-                        onClick={() => handleClick(x, y)}
+                        onClick={() => handleClick(x, y, cell)}
                         style={{
                             width: 40,
                             height: 40,

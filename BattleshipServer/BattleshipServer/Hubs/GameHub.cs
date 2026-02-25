@@ -43,7 +43,7 @@ namespace BattleshipServer.Hubs
             await Clients.Client(game.Player2.ConnectionId!).SendAsync("TurnUpdate", false);
         }
 
-        public async Task PlayerReady(List<ShipPlacement> placements)
+        public async Task PlayerReady(List<Ship> placements)
         {
             var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
             if (game == null) return;
@@ -81,10 +81,26 @@ namespace BattleshipServer.Hubs
             var opponent = game.GetOpponent(player);
             if (opponent == null) return;
 
-            bool isHit = _gameService.CheckShot(opponent, x, y);
+            var ship = _gameService.GetShipAt(opponent, x, y);
+            bool isHit = ship != null;
+            string? sunkShipName = null;
+            bool isGameOver = false;
 
-            await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y, isHit);
-            await Clients.Client(opponent.ConnectionId).SendAsync("IncomingShot", x, y, isHit);
+            if (isHit && ship != null)
+            {
+                _gameService.HitShip(ship);
+                if (ship.IsSunk)
+                {
+                    sunkShipName = ship.ShipName;
+                    isGameOver = opponent.Ships.All(s => s.IsSunk);
+                }
+            }
+
+            string? hitShipName = ship?.ShipName;
+            bool isSunk = ship?.IsSunk ?? false;
+
+            await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y, isHit, hitShipName, isSunk);
+            await Clients.Client(opponent.ConnectionId).SendAsync("IncomingShot", x, y, isHit, hitShipName, isSunk);
 
             _gameService.UpdateTurn(game, isHit);
             await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", isHit);

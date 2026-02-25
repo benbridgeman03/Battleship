@@ -90,9 +90,9 @@ public class GameServiceTests
     {
         var service = new GameService();
         var game = service.CreateGame("player1-id");
-        var placements = new List<ShipPlacement>
+        var placements = new List<Ship>
     {
-        new ShipPlacement
+        new Ship
         {
             ShipName = "carrier",
             StartX = 0,
@@ -117,9 +117,9 @@ public class GameServiceTests
     {
         var service = new GameService();
         var game = service.CreateGame("player1-id");
-        var placements = new List<ShipPlacement>
+        var placements = new List<Ship>
     {
-        new ShipPlacement
+        new Ship
         {
             ShipName = "destroyer",
             StartX = 3,
@@ -141,10 +141,10 @@ public class GameServiceTests
     {
         var service = new GameService();
         var game = service.CreateGame("player1-id");
-        var placements = new List<ShipPlacement>
+        var placements = new List<Ship>
     {
-        new ShipPlacement { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 },
-        new ShipPlacement { ShipName = "destroyer", StartX = 0, StartY = 2, Horizontal = true, Size = 2 }
+        new Ship { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 },
+        new Ship { ShipName = "destroyer", StartX = 0, StartY = 2, Horizontal = true, Size = 2 }
     };
 
         service.SetPlayerShips("player1-id", game, placements);
@@ -158,9 +158,9 @@ public class GameServiceTests
     {
         var service = new GameService();
         var game = service.CreateGame("player1-id");
-        var placements = new List<ShipPlacement>
+        var placements = new List<Ship>
         {
-            new ShipPlacement { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
+            new Ship { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
         };
 
         service.SetPlayerShips("nonexistent-id", game, placements);
@@ -174,9 +174,9 @@ public class GameServiceTests
         var service = new GameService();
         var game = service.CreateGame("player1-id");
 
-        var placements = new List<ShipPlacement>
+        var placements = new List<Ship>
         {
-            new ShipPlacement { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
+            new Ship { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
         };
 
         service.SetPlayerShips("player1-id", game, placements);
@@ -192,9 +192,9 @@ public class GameServiceTests
         var service = new GameService();
         var game = service.CreateGame("player1-id");
 
-        var placements = new List<ShipPlacement>
+        var placements = new List<Ship>
         {
-            new ShipPlacement { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
+            new Ship { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
         };
 
         service.SetPlayerShips("player1-id", game, placements);

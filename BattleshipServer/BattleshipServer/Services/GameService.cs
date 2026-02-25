@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
-using BattleshipServer.Models;
+﻿using BattleshipServer.Models;
 using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
+using System.Collections.Concurrent;
+using System.ComponentModel;
 
 namespace BattleshipServer.Services
 {
@@ -38,20 +39,31 @@ namespace BattleshipServer.Services
                 g.Player2?.ConnectionId == connectionId);
         }
 
-        public void SetPlayerShips(string connectionId, Game game, List<ShipPlacement> placements)
+        public void SetPlayerShips(string connectionId, Game game, List<Ship> placements)
         {
             var player = game.GetPlayer(connectionId);
             if (player == null) return;
 
-            foreach (var placement in placements)
+            player.Ships = placements;
+
+            for (int i = 0; i < placements.Count; i++)
             {
-                for (int i = 0; i < placement.Size; i++)
+                placements[i].id = i;
+                for (int j = 0; j < placements[i].Size; j++)
                 {
-                    int x = placement.Horizontal ? placement.StartX + i : placement.StartX;
-                    int y = placement.Horizontal ? placement.StartY : placement.StartY + i;
-                    player.Board[y, x] = placement.ShipName;
+                    int x = placements[i].Horizontal ? placements[i].StartX + j : placements[i].StartX;
+                    int y = placements[i].Horizontal ? placements[i].StartY : placements[i].StartY + j;
+                    player.Board[y, x] = i.ToString();
                 }
             }
+        }
+
+        public Ship? GetShipAt(Player player, int x, int y)
+        {
+            if (player == null) return null;
+            var shipId = player.Board[y, x];
+            if (shipId == null) return null;
+            return player.Ships.FirstOrDefault(s => s.id.ToString() == shipId);
         }
 
         public void SetPlayerReady(string connectionId, Game game)
@@ -89,6 +101,12 @@ namespace BattleshipServer.Services
         public bool CheckShot(Player oppenent, int x, int y)
         {
             return oppenent.Board[y, x] != null;
+        }
+
+        public void HitShip(Ship ship)
+        {
+            if (ship == null) return;
+            ship.HitsRecieved++;
         }
     }
 }
