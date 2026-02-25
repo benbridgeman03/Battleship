@@ -1,4 +1,5 @@
-﻿using BattleshipServer.Services;
+﻿using BattleshipServer.Models;
+using BattleshipServer.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BattleshipServer.Hubs
@@ -26,13 +27,14 @@ namespace BattleshipServer.Hubs
             if(game == null)
             {
                 await Clients.Caller.SendAsync("Error", "Game not found or full");
+                return;
             }
 
             await Groups.AddToGroupAsync(Context.ConnectionId, game.GameId);
             await Clients.Group(game.GameId).SendAsync("GameStarted");
 
-            await Clients.Client(game.Player1ConnectionId!).SendAsync("TurnUpdate", true);
-            await Clients.Client(game.Player2ConnectionId!).SendAsync("TurnUpdate", false);
+            await Clients.Client(game.Player1.ConnectionId!).SendAsync("TurnUpdate", true);
+            await Clients.Client(game.Player2.ConnectionId!).SendAsync("TurnUpdate", false);
         }
 
         public async Task Fire(int x, int y)
@@ -45,17 +47,18 @@ namespace BattleshipServer.Hubs
                 await Clients.Caller.SendAsync("Error", "Not your turn");
                 return;
             }
+            var player = game.GetPlayer(Context.ConnectionId);
 
-            var opponentId = game.GetOpponentConnectionId(Context.ConnectionId);
-            if (opponentId == null) return;
+            var opponent = game.GetOpponent(player);
+            if (opponent == null) return;
 
             await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y);
 
-            await Clients.Client(opponentId).SendAsync("IncomingShot", x, y);
+            await Clients.Client(opponent.ConnectionId).SendAsync("IncomingShot", x, y);
 
             _gameService.SwitchTurn(game);
             await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", false);
-            await Clients.Client(opponentId).SendAsync("TurnUpdate", true);
+            await Clients.Client(opponent.ConnectionId).SendAsync("TurnUpdate", true);
         }
     }
 }

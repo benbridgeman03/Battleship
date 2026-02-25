@@ -13,19 +13,18 @@ namespace BattleshipServer.Services
             var game = new Game
             {
                 GameId = Guid.NewGuid().ToString()[..6],
-                Player1ConnectionId = playerConnectionId,
                 CurrentTurnConnectionId = playerConnectionId
             };
-
+            game.AddPlayer(playerConnectionId);
             _games[game.GameId] = game;
             return game;
         }
 
         public Game? JoinGame(string gameId, string playerConnectionId)
         {
-            if(_games.TryGetValue(gameId, out var game) && !game.IsFull)
+            if (_games.TryGetValue(gameId, out var game) && !game.IsFull)
             {
-                game.Player2ConnectionId = playerConnectionId;
+                game.AddPlayer(playerConnectionId);
                 return game;
             }
             return null;
@@ -33,12 +32,17 @@ namespace BattleshipServer.Services
 
         public Game? GetGameByPlayer(string connectionId)
         {
-            return _games.Values.FirstOrDefault(g => g.Player1ConnectionId == connectionId || g.Player2ConnectionId == connectionId);
+            return _games.Values.FirstOrDefault(g =>
+                g.Player1?.ConnectionId == connectionId ||
+                g.Player2?.ConnectionId == connectionId);
         }
 
         public void SwitchTurn(Game game)
         {
-            game.CurrentTurnConnectionId = game.CurrentTurnConnectionId == game.Player1ConnectionId ? game.Player2ConnectionId : game.Player1ConnectionId;
+            game.CurrentTurnConnectionId =
+                game.CurrentTurnConnectionId == game.Player1?.ConnectionId
+                    ? game.Player2?.ConnectionId
+                    : game.Player1?.ConnectionId;
         }
     }
 }

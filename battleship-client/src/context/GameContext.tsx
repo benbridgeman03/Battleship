@@ -53,6 +53,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         }
 
         connection.on("GameStarted", () => setScreen("setup"));
+        connection.on("SetupComplete", () => setScreen("game"));
         connection.on("TurnUpdate", (myTurn: boolean) => setIsMyTurn(myTurn));
         connection.on("Error", (msg: string) => alert(msg));
 
