@@ -30,6 +30,12 @@ namespace BattleshipServer.Hubs
                 return;
             }
 
+            if (game.Player1 == null || game.Player2 == null)
+            {
+                await Clients.Caller.SendAsync("Error", "Game setup failed");
+                return;
+            }
+
             await Groups.AddToGroupAsync(Context.ConnectionId, game.GameId);
             await Clients.Group(game.GameId).SendAsync("GameStarted");
 
@@ -37,9 +43,23 @@ namespace BattleshipServer.Hubs
             await Clients.Client(game.Player2.ConnectionId!).SendAsync("TurnUpdate", false);
         }
 
+        public async Task PlayerReady(List<ShipPlacement> placements)
+        {
+            var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
+            if (game == null) return;
+            
+            _gameService.SetPlayerShips(Context.ConnectionId, game, placements);
+            _gameService.SetPlayerReady(Context.ConnectionId, game);
+
+            if (_gameService.BothPlayersReady(game))
+            {
+                await Clients.Group(game.GameId).SendAsync("SetupComplete");
+            }
+        }
+
         public async Task Fire(int x, int y)
         {
-            var game = _gameService.GetGameByPlayer(Context.ConnectionId);
+            var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
             if (game == null) return;
 
             if (game.CurrentTurnConnectionId != Context.ConnectionId)
@@ -47,6 +67,7 @@ namespace BattleshipServer.Hubs
                 await Clients.Caller.SendAsync("Error", "Not your turn");
                 return;
             }
+
             var player = game.GetPlayer(Context.ConnectionId);
 
             var opponent = game.GetOpponent(player);

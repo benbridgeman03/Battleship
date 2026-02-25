@@ -17,10 +17,7 @@
             {
                 Player1 = new Player { ConnectionId = connectionId };
             }
-            else if (Player2 == null)
-            {
-                Player2 = new Player { ConnectionId = connectionId };
-            }
+            else Player2 ??= new Player { ConnectionId = connectionId };
         }
 
         public Player? GetPlayer(string connectionId)

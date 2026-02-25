@@ -12,3 +12,11 @@ export const Ships: Ship[] = [
     { name: "submarine", size: 3, maxCount: 1 },
     { name: "destroyer", size: 2, maxCount: 2 },
 ];
+
+export interface ShipPlacement {
+    shipName: string;
+    startX: number;
+    startY: number;
+    horizontal: boolean;
+    size: number;
+}

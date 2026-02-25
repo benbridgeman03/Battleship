@@ -7,7 +7,6 @@ function Lobby() {
     const [gameId, setGameId] = useState("");
     const [joinCode, setJoinCode] = useState("");
 
-    // gameId only matters here, so it stays local
     connection.on("GameCreated", (id: string) => setGameId(id));
 
     return (

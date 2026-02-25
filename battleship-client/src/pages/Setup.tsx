@@ -2,7 +2,9 @@
 import { useEffect, useState } from "react";
 import { useGame } from "../context/GameContext";
 import { Ships } from "../models/Ship";
+import type { ShipPlacement } from "../models/Ship";
 import GameBoard from "../components/GameBoard";
+import connection from "../services/signalRService";
 
 function Setup() {
     const { myBoard, setMyBoard, selectedShip, setSelectedShip, horizontal, setHorizontal } = useGame();
@@ -13,6 +15,7 @@ function Setup() {
         submarine: 0,
         destroyer: 0,
     });
+    const [placements, setPlacements] = useState<ShipPlacement[]>([]);
     const allPlaced = Ships.every(ship => placedCounts[ship.name] >= ship.maxCount);
 
     useEffect(() => {
@@ -43,6 +46,14 @@ function Setup() {
             }
         }
 
+        setPlacements(prev => [...prev, {
+            shipName: selectedShip.name,
+            startX: x,
+            startY: y,
+            horizontal: horizontal,
+            size: selectedShip.size
+        }]);
+
         setMyBoard(prev => {
             const newCells = prev.map(row => row.map(cell => ({ ...cell })));
             for (let i = 0; i < selectedShip.size; i++) {
@@ -51,16 +62,20 @@ function Setup() {
                 newCells[cy][cx].ship = selectedShip.name;
             }
             return newCells;
+            
         });
 
         setPlacedCounts(prev => ({
             ...prev,
             [selectedShip.name]: prev[selectedShip.name] + 1
         }));
+
         setSelectedShip(null);
     }
 
     function handleReady() {
+        console.log(placements);
+        connection.invoke("PlayerReady", placements);
         alert("Ready to play!");
     }
 
