@@ -56,6 +56,14 @@ namespace BattleshipServer.Hubs
                 await Clients.Group(game.GameId).SendAsync("SetupComplete");
             }
         }
+        
+        public void PlayerUnready()
+        {
+            var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
+            if (game == null) return;
+
+            _gameService.SetPlayerUnready(Context.ConnectionId, game);
+        }
 
         public async Task Fire(int x, int y)
         {
@@ -69,15 +77,17 @@ namespace BattleshipServer.Hubs
             }
 
             var player = game.GetPlayer(Context.ConnectionId);
-
+            if(player == null) return;
             var opponent = game.GetOpponent(player);
             if (opponent == null) return;
 
-            await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y);
+            bool isHit = _gameService.CheckShot(opponent, x, y);
 
-            await Clients.Client(opponent.ConnectionId).SendAsync("IncomingShot", x, y);
+            await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y, isHit);
+            await Clients.Client(opponent.ConnectionId).SendAsync("IncomingShot", x, y, isHit);
 
-            _gameService.SwitchTurn(game);
+            if (!isHit) _gameService.SwitchTurn(game);
+
             await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", false);
             await Clients.Client(opponent.ConnectionId).SendAsync("TurnUpdate", true);
         }

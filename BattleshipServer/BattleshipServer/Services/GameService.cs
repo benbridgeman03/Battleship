@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using BattleshipServer.Models;
+using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 
 namespace BattleshipServer.Services
 {
@@ -60,6 +61,13 @@ namespace BattleshipServer.Services
             player.IsReady =  true;
         }
 
+        public void SetPlayerUnready(string connectionId, Game game)
+        {
+            var player = game.GetPlayer(connectionId);
+            if (player == null) return;
+            player.IsReady = false;
+        }
+
         public bool BothPlayersReady(Game game)
         {
             return game.Player1?.IsReady == true && game.Player2?.IsReady == true;
@@ -73,6 +81,9 @@ namespace BattleshipServer.Services
                     : game.Player1?.ConnectionId;
         }
 
-        //TODO Check player shot
+        public bool CheckShot(Player oppenent, int x, int y)
+        {
+            return oppenent.Board[y, x] != null;
+        }
     }
 }

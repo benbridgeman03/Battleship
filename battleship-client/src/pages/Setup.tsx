@@ -16,6 +16,7 @@ function Setup() {
         destroyer: 0,
     });
     const [placements, setPlacements] = useState<ShipPlacement[]>([]);
+    const [isReady, setIsReady] = useState(false);
     const allPlaced = Ships.every(ship => placedCounts[ship.name] >= ship.maxCount);
 
     useEffect(() => {
@@ -74,14 +75,19 @@ function Setup() {
     }
 
     function handleReady() {
-        console.log(placements);
-        connection.invoke("PlayerReady", placements);
-        alert("Ready to play!");
+        if(isReady){
+            connection.invoke("PlayerUnready");
+            setIsReady(false);
+        }
+        else if(!isReady){
+            connection.invoke("PlayerReady", placements);
+            setIsReady(true);
+        }        
     }
 
     return (
         <div>
-            <h2>Place Your Ships</h2>
+            <h1>{isReady ? "Ready!" : "Setup your ships"}</h1>
             {selectedShip && (
                 <p>Placing: {selectedShip.name} — {horizontal ? "Horizontal" : "Vertical"} — Right click to rotate</p>
             )}
@@ -102,7 +108,7 @@ function Setup() {
                 );
             })}
             <GameBoard isOpponent={false} isSetup={true} cells={myBoard} setCells={setMyBoard} onCellClick={handlePlaceShip} />
-            {allPlaced && <button onClick={handleReady}>Ready!</button>}
+            {allPlaced && <button onClick={handleReady}>{isReady ? "UnReady" : "Ready"}</button>}
         </div>
     );
 }

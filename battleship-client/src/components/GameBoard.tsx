@@ -18,10 +18,11 @@ function GameBoard({ isOpponent, isSetup = false, cells, setCells, onCellClick }
     useEffect(() => {
         const eventName = isOpponent ? "ShotFired" : "IncomingShot";
 
-        connection.on(eventName, (x: number, y: number) => {
+        connection.on(eventName, (x: number, y: number, isHit: boolean) => {
             setCells(prev => {
                 const newCells = prev.map(row => row.map(cell => ({ ...cell })));
                 newCells[y][x].isHit = true;
+                newCells[y][x].isShipHit = isHit;
                 return newCells;
             });
         });
@@ -40,10 +41,14 @@ function GameBoard({ isOpponent, isSetup = false, cells, setCells, onCellClick }
         connection.invoke("Fire", x, y);
     }
 
-    function getCellColor(cell: Cell, isOpponent: boolean, x: number, y: number): string {
-        if (cell.isHit && cell.ship) return "red";
-        if (cell.isHit && !cell.ship) return "white";
-        if (!isOpponent && cell.ship) return "grey";
+function getCellColor(cell: Cell, isOpponent: boolean, x: number, y: number): string {
+        if (isOpponent) {
+            if (cell.isHit) return cell.isShipHit ? "red" : "white";
+        } else {
+            if (cell.isHit && cell.ship) return "red";
+            if (cell.isHit && !cell.ship) return "white";
+            if (cell.ship) return "grey";
+        }
 
         if (hoveredCell && isSetup && selectedShip) {
             for (let i = 0; i < selectedShip.size; i++) {

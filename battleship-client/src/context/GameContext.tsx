@@ -35,12 +35,12 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const [horizontal, setHorizontal] = useState(true);
     const [myBoard, setMyBoard] = useState<Cell[][]>(
         Array(10).fill(null).map(() =>
-            Array(10).fill(null).map(() => ({ ship: null, isHit: false }))
+            Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
         )
     );
     const [opponentBoard, setOpponentBoard] = useState<Cell[][]>(
         Array(10).fill(null).map(() =>
-            Array(10).fill(null).map(() => ({ ship: null, isHit: false }))
+            Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
         )
     );
 

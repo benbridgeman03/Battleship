@@ -159,12 +159,48 @@ public class GameServiceTests
         var service = new GameService();
         var game = service.CreateGame("player1-id");
         var placements = new List<ShipPlacement>
-    {
-        new ShipPlacement { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
-    };
+        {
+            new ShipPlacement { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
+        };
 
         service.SetPlayerShips("nonexistent-id", game, placements);
 
         Assert.Null(game.Player1.Board[0, 0]);
+    }
+
+    [Fact]
+    public void PlayerShot_ShouldReturnTrue()
+    {
+        var service = new GameService();
+        var game = service.CreateGame("player1-id");
+
+        var placements = new List<ShipPlacement>
+        {
+            new ShipPlacement { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
+        };
+
+        service.SetPlayerShips("player1-id", game, placements);
+
+        var isHit = service.CheckShot(game.Player1, 0, 0);
+
+        Assert.True(isHit);
+    }
+
+    [Fact]
+    public void CheckShot_ShouldReturnFalse()
+    {
+        var service = new GameService();
+        var game = service.CreateGame("player1-id");
+
+        var placements = new List<ShipPlacement>
+        {
+            new ShipPlacement { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
+        };
+
+        service.SetPlayerShips("player1-id", game, placements);
+
+        var isHit = service.CheckShot(game.Player1, 9, 9);
+
+        Assert.False(isHit);
     }
 }
