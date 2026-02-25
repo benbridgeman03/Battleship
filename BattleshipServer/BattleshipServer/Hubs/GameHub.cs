@@ -86,10 +86,9 @@ namespace BattleshipServer.Hubs
             await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y, isHit);
             await Clients.Client(opponent.ConnectionId).SendAsync("IncomingShot", x, y, isHit);
 
-            if (!isHit) _gameService.SwitchTurn(game);
-
-            await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", false);
-            await Clients.Client(opponent.ConnectionId).SendAsync("TurnUpdate", true);
+            _gameService.UpdateTurn(game, isHit);
+            await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", isHit);
+            await Clients.Client(opponent.ConnectionId).SendAsync("TurnUpdate", !isHit);
         }
     }
 }

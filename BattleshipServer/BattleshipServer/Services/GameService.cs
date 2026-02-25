@@ -81,6 +81,11 @@ namespace BattleshipServer.Services
                     : game.Player1?.ConnectionId;
         }
 
+        public void UpdateTurn(Game game, bool isHit)
+        {
+            if (!isHit) SwitchTurn(game);
+        }
+
         public bool CheckShot(Player oppenent, int x, int y)
         {
             return oppenent.Board[y, x] != null;
