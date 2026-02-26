@@ -14,7 +14,7 @@ export const Ships: Ship[] = [
 ];
 
 export interface ShipPlacement {
-    shipName: string;
+    shipName: "carrier" | "battleship" | "cruiser" | "submarine" | "destroyer";
     startX: number;
     startY: number;
     horizontal: boolean;
