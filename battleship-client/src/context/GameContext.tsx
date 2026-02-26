@@ -36,6 +36,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
     const [horizontal, setHorizontal] = useState(true);
     const [message, setMessage] = useState<{ text?: string, highlight?: string, color?: string } | null>(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [myBoard, setMyBoard] = useState<Cell[][]>(
         Array(10).fill(null).map(() =>
             Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
@@ -48,8 +49,9 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     );
 
     function showMessage(text?: string, highlight?: string, color?: string, duration: number = 2000) {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setMessage({ text, highlight, color });
-        setTimeout(() => setMessage(null), duration);
+        timeoutRef.current = setTimeout(() => setMessage(null), duration);
     }
 
     useEffect(() => {
