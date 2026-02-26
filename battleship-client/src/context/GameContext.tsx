@@ -5,8 +5,8 @@ import type { Cell } from "../models/Cell";
 import type { Ship } from "../models/Ship";
 
 interface GameContextType {
-    screen: "lobby" | "setup" | "game";
-    setScreen: (s: "lobby" | "setup" | "game") => void;
+    screen: "lobby" | "setup" | "game" | "gameover";
+    setScreen: (s: "lobby" | "setup" | "game" |"gameover") => void;
     myBoard: Cell[][];
     setMyBoard: React.Dispatch<React.SetStateAction<Cell[][]>>;
     opponentBoard: Cell[][];
@@ -19,6 +19,7 @@ interface GameContextType {
     connection: typeof connection;
     message: { text?: string, highlight?: string, color?: string } | null;
     showMessage: ( text: string, highlight?: string, color?: string ) => void;
+    isWinner?: boolean;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -31,12 +32,14 @@ export function useGame() {
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
     const started = useRef(false);
-    const [screen, setScreen] = useState<"lobby" | "setup" | "game">("lobby");
+    const [screen, setScreen] = useState<"lobby" | "setup" | "game" | "gameover">("lobby");
     const [isMyTurn, setIsMyTurn] = useState(false);
     const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
     const [horizontal, setHorizontal] = useState(true);
     const [message, setMessage] = useState<{ text?: string, highlight?: string, color?: string } | null>(null);
+    const [isWinner, setIsWinner] = useState<boolean | undefined>(undefined);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     const [myBoard, setMyBoard] = useState<Cell[][]>(
         Array(10).fill(null).map(() =>
             Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
@@ -66,6 +69,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         connection.on("SetupComplete", () => setScreen("game"));
         connection.on("TurnUpdate", (myTurn: boolean) => setIsMyTurn(myTurn));
         connection.on("Error", (msg: string) => showMessage(undefined, msg, "red"));
+        connection.on("GameOver", (isWinner: boolean) => {
+            setIsWinner(isWinner);
+            setScreen("gameover");
+        });
 
         return () => {
             connection.off("GameStarted");
@@ -83,7 +90,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             selectedShip, setSelectedShip,
             horizontal, setHorizontal,
             connection,
-            message, showMessage
+            message, showMessage,
+            isWinner,
         }}>
             {children}
         </GameContext.Provider>

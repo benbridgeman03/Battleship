@@ -102,6 +102,13 @@ namespace BattleshipServer.Hubs
             await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y, isHit, hitShipName, isSunk);
             await Clients.Client(opponent.ConnectionId).SendAsync("IncomingShot", x, y, isHit, hitShipName, isSunk);
 
+            if (isGameOver)
+            {
+                await Clients.Client(Context.ConnectionId).SendAsync("GameOver", true);
+                await Clients.Client(opponent.ConnectionId).SendAsync("GameOver", false);
+                return;
+            }
+
             _gameService.UpdateTurn(game, isHit);
             await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", isHit);
             await Clients.Client(opponent.ConnectionId).SendAsync("TurnUpdate", !isHit);
