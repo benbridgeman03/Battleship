@@ -15,9 +15,12 @@ builder.Services.AddSingleton<GameService>();
 
 var app = builder.Build();
 
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+    ?? new[] { "http://localhost:5173" };
+
 app.UseCors(policy =>
 {
-    policy.WithOrigins("http://localhost:5173") // Vite's default port
+    policy.WithOrigins(allowedOrigins)
           .AllowAnyHeader()
           .AllowAnyMethod()
           .AllowCredentials(); // Required for SignalR
