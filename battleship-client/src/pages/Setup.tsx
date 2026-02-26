@@ -151,6 +151,18 @@ function Setup() {
         setSelectedShip(null);
     }
 
+    function clearBoard() {
+        setMyBoard(prev => prev.map(row => row.map(cell => ({ ...cell, ship: null }))));
+        setPlacements([]);
+        setPlacedCounts({
+            carrier: 0,
+            battleship: 0,
+            cruiser: 0,
+            submarine: 0,
+            destroyer: 0,
+        });
+    }
+
     return (
         <div>
             <h1>{isReady ? "Ready!" : "Setup your ships"}</h1>
@@ -173,7 +185,10 @@ function Setup() {
                     </div>
                 );
             })}
-            <button onClick={placeRandom}>{"Randomize"}</button>
+            <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={placeRandom}>Randomize</button>
+                <button onClick={clearBoard}>Clear Board</button>
+            </div>
             <GameBoard isOpponent={false} isSetup={true} cells={myBoard} setCells={setMyBoard} onCellClick={handlePlaceShip} />
             {allPlaced && <button onClick={handleReady}>{isReady ? "UnReady" : "Ready"}</button>}
         </div>

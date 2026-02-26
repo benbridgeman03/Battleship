@@ -17,7 +17,7 @@ interface GameContextType {
     horizontal: boolean;
     setHorizontal: React.Dispatch<React.SetStateAction<boolean>>;
     connection: typeof connection;
-    message: { text: string; highlight?: string; color?: string } | null;
+    message: { text?: string, highlight?: string, color?: string } | null;
     showMessage: ( text: string, highlight?: string, color?: string ) => void;
 }
 
@@ -35,7 +35,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const [isMyTurn, setIsMyTurn] = useState(false);
     const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
     const [horizontal, setHorizontal] = useState(true);
-    const [message, setMessage] = useState<{ text: string, highlight?: string, color?: string } | null>(null);
+    const [message, setMessage] = useState<{ text?: string, highlight?: string, color?: string } | null>(null);
     const [myBoard, setMyBoard] = useState<Cell[][]>(
         Array(10).fill(null).map(() =>
             Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
@@ -47,7 +47,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         )
     );
 
-    function showMessage(text: string, highlight?: string, color?: string, duration: number = 2000) {
+    function showMessage(text?: string, highlight?: string, color?: string, duration: number = 2000) {
         setMessage({ text, highlight, color });
         setTimeout(() => setMessage(null), duration);
     }
@@ -63,7 +63,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         connection.on("GameStarted", () => setScreen("setup"));
         connection.on("SetupComplete", () => setScreen("game"));
         connection.on("TurnUpdate", (myTurn: boolean) => setIsMyTurn(myTurn));
-        connection.on("Error", (msg: string) => alert(msg));
+        connection.on("Error", (msg: string) => showMessage(undefined, msg, "red"));
 
         return () => {
             connection.off("GameStarted");
