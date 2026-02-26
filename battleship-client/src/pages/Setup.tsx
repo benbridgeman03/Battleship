@@ -31,6 +31,18 @@ function Setup() {
         return () => window.removeEventListener("contextmenu", handleRightClick);
     }, [selectedShip, setHorizontal]);
 
+    function handleCellClick(x: number, y: number) {
+        const cell = myBoard[y][x];
+        if(cell.ship){
+            moveShip(x, y);
+            return;
+        }
+        else if (cell.ship === null) {
+            handlePlaceShip(x, y);
+            return;
+        }
+    }
+
     function handlePlaceShip(x: number, y: number, ship = selectedShip, isHorizontal = horizontal) {
         if (!ship) return;
         if (placedCounts[ship.name] >= ship.maxCount) return;
@@ -151,6 +163,46 @@ function Setup() {
         setSelectedShip(null);
     }
 
+    function moveShip(x: number, y: number) {
+        const cell = myBoard[y][x];
+        if (!cell.ship) return;
+
+        const shipName = cell.ship;
+        const placement = placements.find(p => {
+            if (p.shipName !== shipName) return false;
+            for (let i = 0; i < p.size; i++) {
+                const cx = p.horizontal ? p.startX + i : p.startX;
+                const cy = p.horizontal ? p.startY : p.startY + i;
+                if (cx === x && cy === y) return true;
+            }
+            return false;
+        });
+        if(!placement) return;
+
+        const ship = Ships.find(s => s.name === shipName);
+        if(!ship) return;
+
+        setMyBoard(prev => {
+            const newCells = prev.map(row => row.map(c => ({ ...c })));
+            for (let i = 0; i < placement.size; i++) {
+                const cx = placement.horizontal ? placement.startX + i : placement.startX;
+                const cy = placement.horizontal ? placement.startY : placement.startY + i;
+                newCells[cy][cx].ship = null as Cell["ship"];
+            }
+            return newCells;
+        });
+
+        setPlacements(prev => prev.filter(p => p !== placement));
+
+        setPlacedCounts(prev => ({
+            ...prev,
+            [shipName]: prev[shipName] - 1
+        }));
+
+        setSelectedShip(ship);
+        setHorizontal(placement.horizontal);
+    }
+
     function clearBoard() {
         setMyBoard(prev => prev.map(row => row.map(cell => ({ ...cell, ship: null }))));
         setPlacements([]);
@@ -189,7 +241,7 @@ function Setup() {
                 <button onClick={placeRandom}>Randomize</button>
                 <button onClick={clearBoard}>Clear Board</button>
             </div>
-            <GameBoard isOpponent={false} isSetup={true} cells={myBoard} setCells={setMyBoard} onCellClick={handlePlaceShip} />
+            <GameBoard isOpponent={false} isSetup={true} cells={myBoard} setCells={setMyBoard} onCellClick={handleCellClick} />
             {allPlaced && <button onClick={handleReady}>{isReady ? "UnReady" : "Ready"}</button>}
         </div>
     );

@@ -59,7 +59,7 @@ function GameBoard({ isOpponent, isSetup = false, cells, setCells, onCellClick }
         connection.invoke("Fire", x, y);
     }
 
-function getCellColor(cell: Cell, isOpponent: boolean, x: number, y: number): string {
+    function getCellColor(cell: Cell, isOpponent: boolean, x: number, y: number): string {
         if (isOpponent) {
             if (cell.isHit) return cell.isShipHit ? "red" : "white";
         } else {
