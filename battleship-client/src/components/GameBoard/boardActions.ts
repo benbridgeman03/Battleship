@@ -7,11 +7,11 @@ export function handleBoardClick(
     cell: Cell,
     isSetup: boolean,
     isOpponent: boolean,
-    showMessage: (text: string) => void,
+    showPopup: (text: string) => void,
     onCellClick?: (x: number, y: number) => void
 ) {
     if (cell.isHit) {
-        showMessage("This cell has already been targeted!");
+        showPopup("This cell has already been targeted!");
         return;
     }
     if (isSetup && !isOpponent) {

@@ -14,10 +14,10 @@ interface GameBoardProps {
 }
 
 function GameBoard({ isOpponent, isSetup = false, cells, setCells, onCellClick }: GameBoardProps) {
-    const { selectedShip, horizontal, showMessage } = useGame();
+    const { selectedShip, horizontal, showPopup } = useGame();
     const [hoveredCell, setHoveredCell] = useState<{ x: number, y: number } | null>(null);
 
-    useBoardEvents(isOpponent, setCells, showMessage);
+    useBoardEvents(isOpponent, setCells, showPopup);
 
     return (
         <div style={{
@@ -31,7 +31,7 @@ function GameBoard({ isOpponent, isSetup = false, cells, setCells, onCellClick }
                         onMouseEnter={() => setHoveredCell({ x, y })}
                         onMouseLeave={() => setHoveredCell(null)}
                         key={`${x}-${y}`}
-                        onClick={() => handleBoardClick(x, y, cell, isSetup, isOpponent, showMessage, onCellClick)}
+                        onClick={() => handleBoardClick(x, y, cell, isSetup, isOpponent, showPopup, onCellClick)}
                         style={{
                             width: 40,
                             height: 40,

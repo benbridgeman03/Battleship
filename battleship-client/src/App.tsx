@@ -3,15 +3,28 @@ import LobbyScreen from "./pages/Lobby";
 import SetupScreen from "./pages/Setup";
 import GameScreen from "./pages/Game";
 import GameOver from "./pages/GameOver";
+import Popup from "./components/Popup";
 
 function AppContent() {
-    const { screen } = useGame();
+    const { screen, popup, closePopup } = useGame();
 
-    if (screen === "lobby") return <LobbyScreen />;
-    if (screen === "setup") return <SetupScreen />;
-    if (screen === "game") return <GameScreen />;
-    if(screen === "gameover") return <GameOver />;
-    return null;
+    return (
+        <>
+            {screen === "lobby" && <LobbyScreen />}
+            {screen === "setup" && <SetupScreen />}
+            {screen === "game" && <GameScreen />}
+            {screen === "gameover" && <GameOver />}
+            {popup && (
+                <Popup
+                    text={popup.text ?? ""}
+                    highlight={popup.highlight}
+                    color={popup.color}
+                    requiresAck={popup.requiresAck}
+                    onClose={closePopup}
+                />
+            )}
+        </>
+    );
 }
 
 function App() {

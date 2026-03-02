@@ -4,6 +4,13 @@ import connection from "../services/signalRService";
 import type { Cell } from "../models/Cell";
 import type { Ship } from "../models/Ship";
 
+interface PopupState {
+    text?: string;
+    highlight?: string;
+    color?: string;
+    requiresAck: boolean;
+}
+
 interface GameContextType {
     screen: "lobby" | "setup" | "game" | "gameover";
     setScreen: (s: "lobby" | "setup" | "game" |"gameover") => void;
@@ -17,8 +24,10 @@ interface GameContextType {
     horizontal: boolean;
     setHorizontal: React.Dispatch<React.SetStateAction<boolean>>;
     connection: typeof connection;
-    message: { text?: string, highlight?: string, color?: string } | null;
-    showMessage: ( text: string, highlight?: string, color?: string ) => void;
+    popup: PopupState | null;
+    showPopup: (text?: string, highlight?: string, color?: string, duration?: number) => void;
+    showAlert: (text?: string, highlight?: string, color?: string) => void;
+    closePopup: () => void;
     isWinner?: boolean;
 }
 
@@ -36,7 +45,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const [isMyTurn, setIsMyTurn] = useState(false);
     const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
     const [horizontal, setHorizontal] = useState(true);
-    const [message, setMessage] = useState<{ text?: string, highlight?: string, color?: string } | null>(null);
+    const [popup, setPopup] = useState<PopupState | null>(null);
     const [isWinner, setIsWinner] = useState<boolean | undefined>(undefined);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -51,10 +60,20 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         )
     );
 
-    function showMessage(text?: string, highlight?: string, color?: string, duration: number = 2000) {
+    function showPopup(text?: string, highlight?: string, color?: string, duration: number = 1000) {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setMessage({ text, highlight, color });
-        timeoutRef.current = setTimeout(() => setMessage(null), duration);
+        setPopup({ text, highlight, color, requiresAck: false });
+        timeoutRef.current = setTimeout(() => setPopup(null), duration);
+    }
+
+    function showAlert(text?: string, highlight?: string, color?: string) {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setPopup({ text, highlight, color, requiresAck: true });
+    }
+
+    function closePopup() {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setPopup(null);
     }
 
     useEffect(() => {
@@ -68,10 +87,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         connection.on("GameStarted", () => setScreen("setup"));
         connection.on("SetupComplete", () => setScreen("game"));
         connection.on("TurnUpdate", (myTurn: boolean) => setIsMyTurn(myTurn));
-        connection.on("Error", (msg: string) => showMessage(undefined, msg, "red"));
+        connection.on("Error", (msg: string) => showPopup(undefined, msg, "red"));
         connection.on("OpponentDisconnected", () => {
             setScreen("lobby");
-            showMessage(undefined, "Opponent disconnected", "red", 4000);
+            showAlert(undefined, "Opponent disconnected", "red");
         });
         connection.on("GameOver", (isWinner: boolean) => {
             setIsWinner(isWinner);
@@ -94,7 +113,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             selectedShip, setSelectedShip,
             horizontal, setHorizontal,
             connection,
-            message, showMessage,
+            popup, showPopup, showAlert, closePopup,
             isWinner,
         }}>
             {children}

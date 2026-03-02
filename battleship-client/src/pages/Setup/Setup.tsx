@@ -8,7 +8,7 @@ import connection from "../../services/signalRService";
 import { placeShip, placeRandom, moveShip, clearBoard } from "./setupActions";
 
 function Setup() {
-    const { myBoard, setMyBoard, selectedShip, setSelectedShip, horizontal, setHorizontal } = useGame();
+    const { myBoard, setMyBoard, selectedShip, setSelectedShip, horizontal, setHorizontal, showAlert } = useGame();
     const [placedCounts, setPlacedCounts] = useState<Record<string, number>>({
         carrier: 0, battleship: 0, cruiser: 0, submarine: 0, destroyer: 0,
     });
@@ -40,7 +40,7 @@ function Setup() {
         } else if (selectedShip) {
             const result = placeShip(myBoard, x, y, selectedShip, horizontal, placedCounts);
             if ("error" in result) {
-                alert(result.error);
+                showAlert(undefined, result.error, "red");
                 return;
             }
             setMyBoard(result.board);
