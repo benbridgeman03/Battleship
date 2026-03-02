@@ -44,12 +44,17 @@ function Game() {
                     }}>
                         {history.length === 0 && <p style={{ color: "#888" }}>No shots fired yet.</p>}
                         {history.map((entry, i) => (
-                            <p key={i} style={{
-                                margin: "0.25rem 0",
-                                color: entry.result === "miss" ? "#888" : entry.result === "sunk" ? "#ff4444" : "#ffaa00",
-                            }}>
-                                {formatEntry(entry)}
-                            </p>
+                            <div key={i}>
+                                <p style={{
+                                    margin: "0.25rem 0",
+                                    color: entry.result === "miss" ? "#888" : entry.result === "sunk" ? "#ff4444" : "#ffaa00",
+                                }}>
+                                    {formatEntry(entry)}
+                                </p>
+                                {entry.result === "miss" && i < history.length - 1 && (
+                                    <hr style={{ border: "none", borderTop: "1px solid #444", margin: "0.5rem 0" }} />
+                                )}
+                            </div>
                         ))}
                         <div ref={historyEndRef} />
                     </div>
