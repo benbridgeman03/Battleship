@@ -3,8 +3,6 @@ using BattleshipServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -20,13 +18,16 @@ var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<stri
 
 app.UseCors(policy =>
 {
+<<<<<<< Updated upstream
     policy.WithOrigins(allowedOrigins)
+=======
+    policy.WithOrigins("http://localhost:5173")
+>>>>>>> Stashed changes
           .AllowAnyHeader()
           .AllowAnyMethod()
-          .AllowCredentials(); // Required for SignalR
+          .AllowCredentials();
 });
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

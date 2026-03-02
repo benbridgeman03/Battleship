@@ -1,5 +1,5 @@
 // screens/LobbyScreen.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGame } from "../context/GameContext";
 
 function Lobby() {
@@ -7,7 +7,12 @@ function Lobby() {
     const [gameId, setGameId] = useState("");
     const [joinCode, setJoinCode] = useState("");
 
-    connection.on("GameCreated", (id: string) => setGameId(id));
+    useEffect(() => {
+        connection.on("GameCreated", (id: string) => setGameId(id));
+        return () => {
+            connection.off("GameCreated");
+        };
+    }, [connection]);
 
     return (
         <div>
