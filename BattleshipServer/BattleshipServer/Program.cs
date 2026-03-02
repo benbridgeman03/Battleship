@@ -18,11 +18,7 @@ var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<stri
 
 app.UseCors(policy =>
 {
-<<<<<<< Updated upstream
-    policy.WithOrigins(allowedOrigins)
-=======
     policy.WithOrigins("http://localhost:5173")
->>>>>>> Stashed changes
           .AllowAnyHeader()
           .AllowAnyMethod()
           .AllowCredentials();
