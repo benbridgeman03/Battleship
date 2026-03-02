@@ -98,12 +98,35 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         connection.on("TurnUpdate", (myTurn: boolean) => setIsMyTurn(myTurn));
         connection.on("Error", (msg: string) => showPopup(undefined, msg, "red"));
         connection.on("OpponentDisconnected", () => {
+            const emptyBoard = () => Array(10).fill(null).map(() =>
+                Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
+            );
+            setMyBoard(emptyBoard());
+            setOpponentBoard(emptyBoard());
+            setHistory([]);
+            setIsMyTurn(false);
+            setSelectedShip(null);
+            setHorizontal(true);
+            setIsWinner(undefined);
             setScreen("lobby");
             showAlert(undefined, "Opponent disconnected", "red");
         });
         connection.on("GameOver", (isWinner: boolean) => {
             setIsWinner(isWinner);
             setScreen("gameover");
+        });
+        connection.on("PlayAgain", () => {
+            const emptyBoard = () => Array(10).fill(null).map(() =>
+                Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
+            );
+            setMyBoard(emptyBoard());
+            setOpponentBoard(emptyBoard());
+            setHistory([]);
+            setIsMyTurn(false);
+            setSelectedShip(null);
+            setHorizontal(true);
+            setIsWinner(undefined);
+            setScreen("setup");
         });
 
         return () => {

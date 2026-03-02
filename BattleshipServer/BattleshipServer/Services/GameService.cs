@@ -23,9 +23,9 @@ namespace BattleshipServer.Services
             return game;
         }
 
-        public void EndGame(string gameId)
+        public void EndGame(Game game)
         {
-            _games.TryRemove(gameId, out _);
+            _games.TryRemove(game.GameId, out _);
         }
 
         public Game? JoinGame(string gameId, string playerConnectionId)
@@ -89,6 +89,23 @@ namespace BattleshipServer.Services
         public bool BothPlayersReady(Game game)
         {
             return game.Player1?.IsReady == true && game.Player2?.IsReady == true;
+        }
+
+        public void SetPlayerPlayAgain(string connectionId, Game game)
+        {
+            var player = game.GetPlayer(connectionId);
+            if (player == null) return;
+            player.PlayAgain = true;
+        }
+
+        public bool BothPlayersPlayAgain(Game game)
+        {
+            return game.Player1?.PlayAgain == true && game.Player2?.PlayAgain == true;
+        }
+
+        public void RestartGame(Game game)
+        {
+            game.ResetGame();
         }
 
         public void SwitchTurn(Game game)

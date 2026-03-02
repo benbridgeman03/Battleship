@@ -33,5 +33,11 @@
             if (player == Player2) return Player1;
             return null;
         }
+
+        public void ResetGame()
+        {
+            if(Player1 != null) Player1.ResetPlayer();
+            if(Player2 != null) Player2.ResetPlayer();
+        }
     }
 }
