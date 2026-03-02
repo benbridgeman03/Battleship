@@ -69,6 +69,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         connection.on("SetupComplete", () => setScreen("game"));
         connection.on("TurnUpdate", (myTurn: boolean) => setIsMyTurn(myTurn));
         connection.on("Error", (msg: string) => showMessage(undefined, msg, "red"));
+        connection.on("OpponentDisconnected", () => {
+            setScreen("lobby");
+            showMessage(undefined, "Opponent disconnected", "red", 4000);
+        });
         connection.on("GameOver", (isWinner: boolean) => {
             setIsWinner(isWinner);
             setScreen("gameover");

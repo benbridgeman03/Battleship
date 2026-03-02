@@ -65,6 +65,20 @@ namespace BattleshipServer.Hubs
             _gameService.SetPlayerUnready(Context.ConnectionId, game);
         }
 
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
+            if (game != null)
+            {
+                var player = game.GetPlayer(Context.ConnectionId);
+                var opponent = game.GetOpponent(player);
+                if (opponent != null)
+                    await Clients.Client(opponent.ConnectionId!).SendAsync("OpponentDisconnected");
+                _gameService.EndGame(game.GameId);
+            }
+            await base.OnDisconnectedAsync(exception);
+        }
+
         public async Task Fire(int x, int y)
         {
             var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
@@ -104,6 +118,7 @@ namespace BattleshipServer.Hubs
 
             if (isGameOver)
             {
+                _gameService.EndGame(game.GameId);
                 await Clients.Client(Context.ConnectionId).SendAsync("GameOver", true);
                 await Clients.Client(opponent.ConnectionId).SendAsync("GameOver", false);
                 return;
@@ -112,6 +127,11 @@ namespace BattleshipServer.Hubs
             _gameService.UpdateTurn(game, isHit);
             await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", isHit);
             await Clients.Client(opponent.ConnectionId).SendAsync("TurnUpdate", !isHit);
+        }
+
+        public async Task PlayAgain()
+        {
+
         }
     }
 }

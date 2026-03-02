@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace BattleshipServer.Services
 {
@@ -20,6 +21,11 @@ namespace BattleshipServer.Services
             game.AddPlayer(playerConnectionId);
             _games[game.GameId] = game;
             return game;
+        }
+
+        public void EndGame(string gameId)
+        {
+            _games.TryRemove(gameId, out _);
         }
 
         public Game? JoinGame(string gameId, string playerConnectionId)
