@@ -24,7 +24,7 @@ namespace BattleshipServer.Hubs
         {
             var game = _gameService.JoinGame(gameId, Context.ConnectionId);
 
-            if(game == null)
+            if (game == null)
             {
                 await Clients.Caller.SendAsync("Error", "Game not found or full");
                 return;
@@ -47,7 +47,7 @@ namespace BattleshipServer.Hubs
         {
             var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
             if (game == null) return;
-            
+
             _gameService.SetPlayerShips(Context.ConnectionId, game, placements);
             _gameService.SetPlayerReady(Context.ConnectionId, game);
 
@@ -56,7 +56,7 @@ namespace BattleshipServer.Hubs
                 await Clients.Group(game.GameId).SendAsync("SetupComplete");
             }
         }
-        
+
         public void PlayerUnready()
         {
             var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
@@ -91,7 +91,7 @@ namespace BattleshipServer.Hubs
             }
 
             var player = game.GetPlayer(Context.ConnectionId);
-            if(player == null) return;
+            if (player == null) return;
             var opponent = game.GetOpponent(player);
             if (opponent == null) return;
 
@@ -130,17 +130,22 @@ namespace BattleshipServer.Hubs
 
         public async Task PlayerPlayAgain()
         {
-            Console.WriteLine("Player play again");
             var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
             if (game == null) return;
 
             _gameService.SetPlayerPlayAgain(Context.ConnectionId, game);
 
+            var count = (game.Player1?.PlayAgain == true ? 1 : 0) + (game.Player2?.PlayAgain == true ? 1 : 0);
+            await Clients.Group(game.GameId).SendAsync("PlayAgainVote", count);
+
             if (_gameService.BothPlayersPlayAgain(game))
             {
                 _gameService.RestartGame(game);
                 await Clients.Group(game.GameId).SendAsync("PlayAgain");
+                await Clients.Client(game.Player1!.ConnectionId!).SendAsync("TurnUpdate", true);
+                await Clients.Client(game.Player2!.ConnectionId!).SendAsync("TurnUpdate", false);
             }
+
         }
     }
 }

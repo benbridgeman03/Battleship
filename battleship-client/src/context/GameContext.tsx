@@ -31,6 +31,7 @@ interface GameContextType {
     showPopup: (text?: string, highlight?: string, color?: string, duration?: number) => void;
     showAlert: (text?: string, highlight?: string, color?: string) => void;
     closePopup: () => void;
+    resetGame: () => void;
     isWinner?: boolean;
 }
 
@@ -85,6 +86,19 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         setPopup(null);
     }
 
+    function resetGame() {
+        const emptyBoard = () => Array(10).fill(null).map(() =>
+            Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
+        );
+        setMyBoard(emptyBoard());
+        setOpponentBoard(emptyBoard());
+        setHistory([]);
+        setIsMyTurn(false);
+        setSelectedShip(null);
+        setHorizontal(true);
+        setIsWinner(undefined);
+    }
+
     useEffect(() => {
         if (!started.current) {
             started.current = true;
@@ -98,16 +112,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         connection.on("TurnUpdate", (myTurn: boolean) => setIsMyTurn(myTurn));
         connection.on("Error", (msg: string) => showPopup(undefined, msg, "red"));
         connection.on("OpponentDisconnected", () => {
-            const emptyBoard = () => Array(10).fill(null).map(() =>
-                Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
-            );
-            setMyBoard(emptyBoard());
-            setOpponentBoard(emptyBoard());
-            setHistory([]);
-            setIsMyTurn(false);
-            setSelectedShip(null);
-            setHorizontal(true);
-            setIsWinner(undefined);
+            resetGame();
             setScreen("lobby");
             showAlert(undefined, "Opponent disconnected", "red");
         });
@@ -116,16 +121,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             setScreen("gameover");
         });
         connection.on("PlayAgain", () => {
-            const emptyBoard = () => Array(10).fill(null).map(() =>
-                Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
-            );
-            setMyBoard(emptyBoard());
-            setOpponentBoard(emptyBoard());
-            setHistory([]);
-            setIsMyTurn(false);
-            setSelectedShip(null);
-            setHorizontal(true);
-            setIsWinner(undefined);
+            resetGame();
             setScreen("setup");
         });
 
@@ -146,7 +142,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             selectedShip, setSelectedShip,
             horizontal, setHorizontal,
             connection,
-            popup, showPopup, showAlert, closePopup,
+            popup, showPopup, showAlert, closePopup, resetGame,
             isWinner,
         }}>
             {children}

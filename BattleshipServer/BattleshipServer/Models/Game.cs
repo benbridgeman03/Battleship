@@ -38,6 +38,7 @@
         {
             if(Player1 != null) Player1.ResetPlayer();
             if(Player2 != null) Player2.ResetPlayer();
+            CurrentTurnConnectionId = Player1?.ConnectionId;
         }
     }
 }
