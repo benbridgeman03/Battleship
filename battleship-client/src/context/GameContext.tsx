@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useRef, useEffect } from "react";
 import connection from "../services/signalRService";
 import type { Cell } from "../models/Cell";
 import type { Ship } from "../models/Ship";
+import type { HistoryEntry } from "../models/HistoryEntry";
 
 interface PopupState {
     text?: string;
@@ -18,6 +19,8 @@ interface GameContextType {
     setMyBoard: React.Dispatch<React.SetStateAction<Cell[][]>>;
     opponentBoard: Cell[][];
     setOpponentBoard: React.Dispatch<React.SetStateAction<Cell[][]>>;
+    history: HistoryEntry[];
+    addHistoryEntry: (entry: HistoryEntry) => void;
     isMyTurn: boolean;
     selectedShip: Ship | null;
     setSelectedShip: (s: Ship | null) => void;
@@ -59,6 +62,12 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             Array(10).fill(null).map(() => ({ ship: null, isHit: false, isShipHit: false }))
         )
     );
+
+    const [history, setHistory] = useState<HistoryEntry[]>([]);
+
+    function addHistoryEntry(entry: HistoryEntry) {
+        setHistory(prev => [...prev, entry]);
+    }
 
     function showPopup(text?: string, highlight?: string, color?: string, duration: number = 1000) {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -108,6 +117,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         <GameContext.Provider value={{
             screen, setScreen,
             myBoard, setMyBoard,
+            history, addHistoryEntry,
             opponentBoard, setOpponentBoard,
             isMyTurn,
             selectedShip, setSelectedShip,

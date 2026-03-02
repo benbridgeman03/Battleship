@@ -1,12 +1,15 @@
 import { useEffect } from "react";
 import connection from "../../services/signalRService";
 import type { Cell } from "../../models/Cell";
+import { useGame } from "../../context/GameContext";
 
 export function useBoardEvents(
     isOpponent: boolean,
     setCells: React.Dispatch<React.SetStateAction<Cell[][]>>,
     showPopup: (text: string, highlight?: string, color?: string) => void)
     {
+    const { addHistoryEntry } = useGame();
+
     useEffect(() => {
         const eventName = isOpponent ? "ShotFired" : "IncomingShot";
 
@@ -16,6 +19,14 @@ export function useBoardEvents(
                 newCells[y][x].isHit = true;
                 newCells[y][x].isShipHit = isHit;
                 return newCells;
+            });
+
+            addHistoryEntry({
+                player: isOpponent ? "you" : "opponent",
+                x,
+                y,
+                result: isSunk ? "sunk" : isHit ? "hit" : "miss",
+                shipName: hitShipName || undefined,
             });
 
             if (isOpponent) {
@@ -36,5 +47,5 @@ export function useBoardEvents(
         return () => {
             connection.off(eventName);
         };
-    }, [isOpponent, setCells, showPopup]);
+    }, [isOpponent, setCells, showPopup, addHistoryEntry]);
 }
