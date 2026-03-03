@@ -22,8 +22,8 @@ A real-time multiplayer Battleship game. Players create or join games using a 6-
 
 ## Hosting
 
-- **Client** -- Cloudflare Pages (deployed via Wrangler)
-- **Server** -- Render
+- **Client** - Cloudflare Pages (deployed via Wrangler)
+- **Server** - Render
 
 ## Screenshots
 
