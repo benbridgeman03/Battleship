@@ -145,7 +145,6 @@ namespace BattleshipServer.Hubs
                 await Clients.Client(game.Player1!.ConnectionId!).SendAsync("TurnUpdate", true);
                 await Clients.Client(game.Player2!.ConnectionId!).SendAsync("TurnUpdate", false);
             }
-
         }
     }
 }

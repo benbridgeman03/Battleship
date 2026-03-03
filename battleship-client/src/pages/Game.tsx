@@ -12,7 +12,7 @@ function formatEntry(entry: { player: string; x: number; y: number; result: stri
 }
 
 function Game() {
-    const { myBoard, setMyBoard, opponentBoard, setOpponentBoard, isMyTurn, history } = useGame();
+    const { myBoard, setMyBoard, opponentBoard, setOpponentBoard, isMyTurn, history, handleLeaveGamePopup } = useGame();
     const historyEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -29,6 +29,9 @@ function Game() {
                 <div className="board-section">
                     <div className="board-label">Your Waters</div>
                     <GameBoard isOpponent={false} cells={myBoard} setCells={setMyBoard} />
+                    <button className="btn-danger" style={{alignSelf: "flex-start"}} onClick={handleLeaveGamePopup}>
+                        Leave Game
+                    </button>
                 </div>
 
                 <div className="board-section">

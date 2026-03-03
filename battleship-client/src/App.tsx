@@ -22,6 +22,7 @@ function AppContent() {
                     color={popup.color}
                     requiresAck={popup.requiresAck}
                     onClose={closePopup}
+                    onConfirm={popup.onConfirm}
                 />
             )}
         </>

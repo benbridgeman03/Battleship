@@ -8,7 +8,7 @@ import connection from "../../services/signalRService";
 import { placeShip, placeRandom, moveShip, clearBoard } from "./setupActions";
 
 function Setup() {
-    const { myBoard, setMyBoard, selectedShip, setSelectedShip, horizontal, setHorizontal, setMyPlacements, showAlert } = useGame();
+    const { myBoard, setMyBoard, selectedShip, setSelectedShip, horizontal, setHorizontal, setMyPlacements, showAlert, handleLeaveGamePopup } = useGame();
     const [placedCounts, setPlacedCounts] = useState<Record<string, number>>({
         carrier: 0, battleship: 0, cruiser: 0, submarine: 0, destroyer: 0,
     });
@@ -97,39 +97,44 @@ function Setup() {
             </div>
 
             <div className="setup-layout">
-                <div className="setup-sidebar panel panel-glow">
-                    <h2 style={{ marginBottom: "0.75rem" }}>Fleet</h2>
-                    {Ships.map((ship) => {
-                        const remaining = ship.maxCount - placedCounts[ship.name];
-                        const isFullyPlaced = remaining <= 0;
-                        const isSelected = selectedShip?.name === ship.name;
+                <div className="setup-sidebar">
+                    <div className="panel panel-glow">
+                        <h2 style={{ marginBottom: "0.75rem" }}>Fleet</h2>
+                        {Ships.map((ship) => {
+                            const remaining = ship.maxCount - placedCounts[ship.name];
+                            const isFullyPlaced = remaining <= 0;
+                            const isSelected = selectedShip?.name === ship.name;
 
-                        return (
-                            <div
-                                key={ship.name}
-                                className={`ship-card${isSelected ? " selected" : ""}${isFullyPlaced ? " placed" : ""}`}
-                                onClick={() => !isFullyPlaced && setSelectedShip(ship)}
-                                style={{ cursor: isFullyPlaced ? "default" : "pointer" }}
-                            >
-                                <div className="ship-info">
-                                    <span className="ship-name">{ship.name}</span>
-                                    <span className="ship-meta">
-                                        {remaining > 0 ? `${remaining} remaining` : "Deployed"}
-                                    </span>
+                            return (
+                                <div
+                                    key={ship.name}
+                                    className={`ship-card${isSelected ? " selected" : ""}${isFullyPlaced ? " placed" : ""}`}
+                                    onClick={() => !isFullyPlaced && setSelectedShip(ship)}
+                                    style={{ cursor: isFullyPlaced ? "default" : "pointer" }}
+                                >
+                                    <div className="ship-info">
+                                        <span className="ship-name">{ship.name}</span>
+                                        <span className="ship-meta">
+                                            {remaining > 0 ? `${remaining} remaining` : "Deployed"}
+                                        </span>
+                                    </div>
+                                    <div className="ship-dots">
+                                        {Array.from({ length: ship.size }, (_, i) => (
+                                            <div key={i} className="ship-dot" />
+                                        ))}
+                                    </div>
                                 </div>
-                                <div className="ship-dots">
-                                    {Array.from({ length: ship.size }, (_, i) => (
-                                        <div key={i} className="ship-dot" />
-                                    ))}
-                                </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
 
-                    <div style={{ marginTop: "0.75rem" }} className="setup-actions">
-                        <button onClick={handlePlaceRandom}>Randomize</button>
-                        <button className="btn-ghost" onClick={handleClearBoard}>Clear</button>
+                        <div style={{ marginTop: "0.75rem" }} className="setup-actions">
+                            <button onClick={handlePlaceRandom}>Randomize</button>
+                            <button className="btn-ghost" onClick={handleClearBoard}>Clear</button>
+                        </div>
                     </div>
+                    <button className="btn-danger" style={{alignSelf: "flex-start", width: "100%", marginTop: "0.75rem"}} onClick={handleLeaveGamePopup}>
+                        Leave Game
+                    </button>
                 </div>
 
                 <div className="setup-board-area">

@@ -4,12 +4,14 @@ import connection from "../services/signalRService";
 import type { Cell } from "../models/Cell";
 import type { Ship, ShipPlacement } from "../models/Ship";
 import type { HistoryEntry } from "../models/HistoryEntry";
+import type { PopupType } from "../components/Popup";
 
 interface PopupState {
     text?: string;
     highlight?: string;
     color?: string;
-    requiresAck: boolean;
+    requiresAck: PopupType;
+    onConfirm?: () => void;
 }
 
 interface GameContextType {
@@ -32,7 +34,9 @@ interface GameContextType {
     popup: PopupState | null;
     showPopup: (text?: string, highlight?: string, color?: string, duration?: number) => void;
     showAlert: (text?: string, highlight?: string, color?: string) => void;
+    showConfirm: (opts: { text?: string; highlight?: string; color?: string; onConfirm: () => void }) => void;
     closePopup: () => void;
+    handleLeaveGamePopup: () => void;
     resetGame: () => void;
     isWinner?: boolean;
 }
@@ -75,18 +79,34 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
     function showPopup(text?: string, highlight?: string, color?: string, duration: number = 1000) {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setPopup({ text, highlight, color, requiresAck: false });
+        setPopup({ text, highlight, color, requiresAck: { type: "timeout" } });
         timeoutRef.current = setTimeout(() => setPopup(null), duration);
     }
 
     function showAlert(text?: string, highlight?: string, color?: string) {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setPopup({ text, highlight, color, requiresAck: true });
+        setPopup({ text, highlight, color, requiresAck: { type: "dismiss" } });
+    }
+
+    function showConfirm({ text, highlight, color, onConfirm }: { text?: string; highlight?: string; color?: string; onConfirm: () => void }) {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setPopup({ text, highlight, color, requiresAck: { type: "confirm" }, onConfirm });
     }
 
     function closePopup() {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setPopup(null);
+    }
+
+    function handleLeaveGamePopup() {
+        showConfirm({text: "Leave game?", color: "red", onConfirm: () => handleLeaveGame(),});
+    }
+
+    async function handleLeaveGame() {
+        await connection.stop();
+        await connection.start();
+        resetGame();
+        setScreen("lobby");
     }
 
     function resetGame() {
@@ -147,7 +167,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             horizontal, setHorizontal,
             myPlacements, setMyPlacements,
             connection,
-            popup, showPopup, showAlert, closePopup, resetGame,
+            popup, showPopup, showAlert, showConfirm, closePopup, resetGame,
+            handleLeaveGamePopup, 
             isWinner,
         }}>
             {children}

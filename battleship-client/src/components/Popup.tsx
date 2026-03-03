@@ -1,12 +1,17 @@
+interface PopupType {
+    type: "timeout" | "dismiss" | "confirm";
+}
+
 interface PopupProps {
     text: string;
     highlight?: string;
     color?: string;
-    requiresAck: boolean;
+    requiresAck: PopupType;
     onClose: () => void;
+    onConfirm?: () => void;
 }
 
-function Popup({ text, highlight, color, requiresAck, onClose }: PopupProps) {
+function Popup({ text, highlight, color, requiresAck, onClose, onConfirm }: PopupProps) {
     return (
         <div className="popup-overlay">
             <div className="popup-modal">
@@ -16,10 +21,27 @@ function Popup({ text, highlight, color, requiresAck, onClose }: PopupProps) {
                         {highlight}
                     </div>
                 )}
-                {requiresAck && (
+                {requiresAck.type === "dismiss" && (
                     <button onClick={onClose} style={{ marginTop: "1.25rem" }}>
                         Dismiss
                     </button>
+                )}
+                {requiresAck.type === "confirm" && (
+                    <div
+                        style={{
+                            marginTop: "1.25rem",
+                            display: "flex",
+                            gap: "0.75rem",
+                            justifyContent: "center",
+                        }}>
+                        <button onClick={onClose}>
+                            Cancel
+                        </button>
+
+                        <button className="btn-primary" onClick={() => { onConfirm?.(); onClose(); }}>
+                            Confirm
+                        </button>
+                    </div>
                 )}
             </div>
         </div>
@@ -27,3 +49,4 @@ function Popup({ text, highlight, color, requiresAck, onClose }: PopupProps) {
 }
 
 export default Popup;
+export type { PopupType };
