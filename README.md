@@ -11,7 +11,6 @@ A real-time multiplayer Battleship game. Players create or join games using a 6-
 - React 19 with TypeScript
 - Vite
 - Microsoft SignalR client
-- CSS custom properties (no framework)
 
 ### Server
 
