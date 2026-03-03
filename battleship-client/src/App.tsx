@@ -7,7 +7,7 @@ import GameOver from "./pages/GameOver";
 import Popup from "./components/Popup";
 
 function AppContent() {
-    const { screen, popup, closePopup } = useGame();
+    const { screen, popup, closePopup, isConnected } = useGame();
 
     return (
         <>
@@ -24,6 +24,15 @@ function AppContent() {
                     onClose={closePopup}
                     onConfirm={popup.onConfirm}
                 />
+            )}
+            {!isConnected && (
+                <div className="popup-overlay">
+                    <div className="popup-modal">
+                        <div className="connecting-spinner" />
+                        <p className="popup-text">Please wait</p>
+                        <div className="popup-highlight">Connecting to server</div>
+                    </div>
+                </div>
             )}
         </>
     );

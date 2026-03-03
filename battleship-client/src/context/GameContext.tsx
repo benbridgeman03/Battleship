@@ -31,6 +31,7 @@ interface GameContextType {
     myPlacements: ShipPlacement[];
     setMyPlacements: React.Dispatch<React.SetStateAction<ShipPlacement[]>>;
     connection: typeof connection;
+    isConnected: boolean;
     popup: PopupState | null;
     showPopup: (text?: string, highlight?: string, color?: string, duration?: number) => void;
     showAlert: (text?: string, highlight?: string, color?: string) => void;
@@ -58,6 +59,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const [myPlacements, setMyPlacements] = useState<ShipPlacement[]>([]);
     const [popup, setPopup] = useState<PopupState | null>(null);
     const [isWinner, setIsWinner] = useState<boolean | undefined>(undefined);
+    const [isConnected, setIsConnected] = useState(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [myBoard, setMyBoard] = useState<Cell[][]>(
@@ -126,10 +128,27 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (!started.current) {
             started.current = true;
-            connection.start()
-                .then(() => console.log("Connected to SignalR!"))
-                .catch((err: Error) => console.error("Connection failed: ", err));
+            const startConnection = async () => {
+                const delays = [0, 2000, 5000, 10000, 15000, 30000];
+                for (let i = 0; ; i++) {
+                    try {
+                        await connection.start();
+                        console.log("Connected to SignalR!");
+                        setIsConnected(true);
+                        return;
+                    } catch (err) {
+                        const delay = delays[Math.min(i, delays.length - 1)];
+                        console.error(`Connection failed, retrying in ${delay}ms...`, err);
+                        await new Promise(r => setTimeout(r, delay));
+                    }
+                }
+            };
+            startConnection();
         }
+
+        connection.onreconnecting(() => setIsConnected(false));
+        connection.onreconnected(() => setIsConnected(true));
+        connection.onclose(() => setIsConnected(false));
 
         connection.on("GameStarted", () => setScreen("setup"));
         connection.on("SetupComplete", () => setScreen("game"));
@@ -166,7 +185,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             selectedShip, setSelectedShip,
             horizontal, setHorizontal,
             myPlacements, setMyPlacements,
-            connection,
+            connection, isConnected,
             popup, showPopup, showAlert, showConfirm, closePopup, resetGame,
             handleLeaveGamePopup, 
             isWinner,
