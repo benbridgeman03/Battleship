@@ -37,7 +37,7 @@
 .page-header h1::after {
   content: "";
   display: block;
-  width: 60%;
+  width: 90%;
   height: 2px;
   margin: 0.5rem auto 0;
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
