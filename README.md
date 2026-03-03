@@ -24,3 +24,20 @@ A real-time multiplayer Battleship game. Players create or join games using a 6-
 
 - **Client** -- Cloudflare Pages (deployed via Wrangler)
 - **Server** -- Render
+
+## Screenshots
+
+### Main Lobby
+![Main Lobby](screenshots/MainLobby.png)
+
+### Setup Screen
+![Setup Screen](screenshots/PlaceShips.png)
+
+### During Game
+![During Game](screenshots/MidGame.png)
+
+### Ship Sunk
+![Ship Sunk](screenshots/ShipSunk.png)
+
+### Game Over
+![Game Over](screenshots/GameOver.png)
