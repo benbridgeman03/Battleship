@@ -6,36 +6,19 @@ interface PopupProps {
     onClose: () => void;
 }
 
-const overlayStyle: React.CSSProperties = {
-    position: "fixed",
-    inset: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1000,
-};
-
-const modalStyle: React.CSSProperties = {
-    backgroundColor: "#1a1a1a",
-    border: "1px solid #333",
-    borderRadius: "12px",
-    padding: "2rem 3rem",
-    textAlign: "center",
-    minWidth: "280px",
-};
-
 function Popup({ text, highlight, color, requiresAck, onClose }: PopupProps) {
     return (
-        <div style={overlayStyle}>
-            <div style={modalStyle}>
-                {text && <p style={{ margin: "0 0 0.5rem" }}>{text}</p>}
+        <div className="popup-overlay">
+            <div className="popup-modal">
+                {text && <p className="popup-text">{text}</p>}
                 {highlight && (
-                    <h3 style={{ color: color || "white", margin: "0.5rem 0" }}>{highlight}</h3>
+                    <div className="popup-highlight" style={{ color: color || "var(--text-bright)" }}>
+                        {highlight}
+                    </div>
                 )}
                 {requiresAck && (
-                    <button onClick={onClose} style={{ marginTop: "1rem" }}>
-                        OK
+                    <button onClick={onClose} style={{ marginTop: "1.25rem" }}>
+                        Dismiss
                     </button>
                 )}
             </div>

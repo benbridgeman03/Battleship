@@ -20,39 +20,35 @@ function Game() {
     }, [history]);
 
     return (
-        <div>
-            <h1>Battleship</h1>
-            <h3>{isMyTurn ? "Your turn" : "Waiting for opponent..."}</h3>
-            <div style={{ display: "flex", gap: "60px" }}>
-                <div>
-                    <h2>Your Board</h2>
+        <div className="page">
+            <div className={`turn-indicator ${isMyTurn ? "your-turn" : "waiting"}`}>
+                {isMyTurn ? "Your Turn — Fire!" : "Opponent's Turn..."}
+            </div>
+
+            <div className="game-layout">
+                <div className="board-section">
+                    <div className="board-label">Your Waters</div>
                     <GameBoard isOpponent={false} cells={myBoard} setCells={setMyBoard} />
                 </div>
-                <div>
-                    <h2>Opponent's Board</h2>
+
+                <div className="board-section">
+                    <div className="board-label">Enemy Waters</div>
                     <GameBoard isOpponent={true} cells={opponentBoard} setCells={setOpponentBoard} />
                 </div>
-                <div style={{ minWidth: "250px" }}>
-                    <h2>History</h2>
-                    <div style={{
-                        height: "420px",
-                        overflowY: "auto",
-                        border: "1px solid #333",
-                        borderRadius: "8px",
-                        padding: "0.5rem",
-                        textAlign: "left",
-                    }}>
-                        {history.length === 0 && <p style={{ color: "#888" }}>No shots fired yet.</p>}
+
+                <div className="history-panel panel panel-glow">
+                    <div className="board-label" style={{ marginBottom: "0.5rem" }}>Battle Log</div>
+                    <div className="history-scroll">
+                        {history.length === 0 && (
+                            <div className="history-empty">No shots fired yet.</div>
+                        )}
                         {history.map((entry, i) => (
                             <div key={i}>
-                                <p style={{
-                                    margin: "0.25rem 0",
-                                    color: entry.result === "miss" ? "#888" : entry.result === "sunk" ? "#ff4444" : "#ffaa00",
-                                }}>
+                                <div className={`history-entry ${entry.result}`}>
                                     {formatEntry(entry)}
-                                </p>
+                                </div>
                                 {entry.result === "miss" && i < history.length - 1 && (
-                                    <hr style={{ border: "none", borderTop: "1px solid #444", margin: "0.5rem 0" }} />
+                                    <div className="history-divider" />
                                 )}
                             </div>
                         ))}

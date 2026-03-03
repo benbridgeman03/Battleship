@@ -1,3 +1,4 @@
+import "./App.css";
 import { GameProvider, useGame } from "./context/GameContext";
 import LobbyScreen from "./pages/Lobby";
 import SetupScreen from "./pages/Setup";

@@ -26,13 +26,25 @@ function GameOver() {
     }
 
     return (
-        <div style={{ textAlign: "center", marginTop: "50px" }}>
-            <h1>Game Over</h1>
-            <p>{isWinner ? "You win!" : "You lose!"}</p>
-            <p>Thanks for playing!</p>
-            <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-                <button onClick={handlePlayAgain}>Play Again ({voteCount}/2)</button>
-                <button onClick={handleLeave}>Leave</button>
+        <div className="page">
+            <div className="gameover-container">
+                <h2>Game Over</h2>
+                <div className={`gameover-result ${isWinner ? "victory" : "defeat"}`}>
+                    {isWinner ? "Victory" : "Defeat"}
+                </div>
+                <div className="gameover-sub">
+                    {isWinner ? "Enemy fleet destroyed. Well played, Commander." : "Your fleet has been sunk."}
+                </div>
+                <div className="gameover-actions">
+                    <button
+                        className={playAgain ? "btn-ghost" : "btn-primary"}
+                        onClick={handlePlayAgain}
+                        disabled={playAgain}
+                    >
+                        {playAgain ? `Waiting... (${voteCount}/2)` : `Play Again (${voteCount}/2)`}
+                    </button>
+                    <button onClick={handleLeave}>Leave</button>
+                </div>
             </div>
         </div>
     );

@@ -2,17 +2,19 @@
     display: grid;
     grid-template-columns: repeat(10, 40px);
     grid-template-rows: repeat(10, 40px);
-    border: 2px solid #0a2a3a;
+    border: 2px solid #0d3050;
     border-radius: 4px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 0 40px rgba(10, 30, 60, 0.5),
+                inset 0 0 30px rgba(0, 0, 0, 0.15);
 
     background:
-        radial-gradient(ellipse at 20% 50%, rgba(0, 180, 220, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 30%, rgba(0, 150, 200, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 80%, rgba(0, 200, 240, 0.25) 0%, transparent 40%),
-        radial-gradient(ellipse at 60% 20%, rgba(100, 200, 255, 0.2) 0%, transparent 35%),
-        linear-gradient(180deg, #1a7ab0 0%, #0e4a6e 100%);
+        radial-gradient(ellipse at 20% 50%, rgba(0, 160, 200, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(0, 130, 180, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(0, 180, 220, 0.2) 0%, transparent 40%),
+        radial-gradient(ellipse at 60% 20%, rgba(80, 180, 235, 0.15) 0%, transparent 35%),
+        linear-gradient(180deg, #103858 0%, #0a2a44 100%);
     background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 100% 100%;
     animation: water-wave 8s ease-in-out infinite;
 }
@@ -28,7 +30,7 @@
     width: 40px;
     height: 40px;
     box-sizing: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(0, 40, 70, 0.4);
     cursor: default;
     transition: background-color 0.15s ease;
     position: relative;
