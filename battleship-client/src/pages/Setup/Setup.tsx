@@ -8,12 +8,16 @@ import connection from "../../services/signalRService";
 import { placeShip, placeRandom, moveShip, clearBoard } from "./setupActions";
 
 function Setup() {
-    const { myBoard, setMyBoard, selectedShip, setSelectedShip, horizontal, setHorizontal, showAlert } = useGame();
+    const { myBoard, setMyBoard, selectedShip, setSelectedShip, horizontal, setHorizontal, setMyPlacements, showAlert } = useGame();
     const [placedCounts, setPlacedCounts] = useState<Record<string, number>>({
         carrier: 0, battleship: 0, cruiser: 0, submarine: 0, destroyer: 0,
     });
     const [placements, setPlacements] = useState<ShipPlacement[]>([]);
     const [isReady, setIsReady] = useState(false);
+
+    useEffect(() => {
+        setMyPlacements(placements);
+    }, [placements, setMyPlacements]);
     const allPlaced = Ships.every(ship => placedCounts[ship.name] >= ship.maxCount);
 
     useEffect(() => {

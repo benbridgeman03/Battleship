@@ -12,25 +12,24 @@ export function getCellColor(
     horizontal: boolean
 ): string {
     if (isOpponent) {
-        if (cell.isHit) return cell.isShipHit ? "red" : "white";
+        if (cell.isHit) return cell.isShipHit ? "rgba(200,30,30,0.8)" : "rgba(255,255,255,0.6)";
     } else {
-        if (cell.isHit && cell.ship) return "red";
-        if (cell.isHit && !cell.ship) return "white";
-        if (cell.ship) return "grey";
+        if (cell.isHit && cell.ship) return "rgba(200,30,30,0.6)";
+        if (cell.isHit && !cell.ship) return "rgba(255,255,255,0.6)";
+        if (cell.ship) return "transparent";
     }
 
     if (hoveredCell && isSetup && selectedShip) {
         const previewCells = getShipPreviewCells(hoveredCell, selectedShip, horizontal);
-        if (previewCells.some(c => c.x === x && c.y === y)) return "lightgreen";
+        if (previewCells.some(c => c.x === x && c.y === y)) return "rgba(100,220,100,0.5)";
     }
 
     if (hoveredCell && isOpponent && x === hoveredCell.x && y === hoveredCell.y) {
-        return "lightyellow";
+        return "rgba(255,255,200,0.3)";
     }
 
-    return "lightblue";
+    return "transparent";
 }
-
 export function getShipPreviewCells(
     hoveredCell: { x: number; y: number },
     selectedShip: Ship,

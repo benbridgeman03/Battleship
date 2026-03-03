@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useRef, useEffect } from "react";
 import connection from "../services/signalRService";
 import type { Cell } from "../models/Cell";
-import type { Ship } from "../models/Ship";
+import type { Ship, ShipPlacement } from "../models/Ship";
 import type { HistoryEntry } from "../models/HistoryEntry";
 
 interface PopupState {
@@ -26,6 +26,8 @@ interface GameContextType {
     setSelectedShip: (s: Ship | null) => void;
     horizontal: boolean;
     setHorizontal: React.Dispatch<React.SetStateAction<boolean>>;
+    myPlacements: ShipPlacement[];
+    setMyPlacements: React.Dispatch<React.SetStateAction<ShipPlacement[]>>;
     connection: typeof connection;
     popup: PopupState | null;
     showPopup: (text?: string, highlight?: string, color?: string, duration?: number) => void;
@@ -49,6 +51,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const [isMyTurn, setIsMyTurn] = useState(false);
     const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
     const [horizontal, setHorizontal] = useState(true);
+    const [myPlacements, setMyPlacements] = useState<ShipPlacement[]>([]);
     const [popup, setPopup] = useState<PopupState | null>(null);
     const [isWinner, setIsWinner] = useState<boolean | undefined>(undefined);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -96,6 +99,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         setIsMyTurn(false);
         setSelectedShip(null);
         setHorizontal(true);
+        setMyPlacements([]);
         setIsWinner(undefined);
     }
 
@@ -141,6 +145,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             isMyTurn,
             selectedShip, setSelectedShip,
             horizontal, setHorizontal,
+            myPlacements, setMyPlacements,
             connection,
             popup, showPopup, showAlert, closePopup, resetGame,
             isWinner,

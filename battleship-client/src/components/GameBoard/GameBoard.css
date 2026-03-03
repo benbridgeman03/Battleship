@@ -1,0 +1,47 @@
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(10, 40px);
+    grid-template-rows: repeat(10, 40px);
+    border: 2px solid #0a2a3a;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(0, 180, 220, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(0, 150, 200, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(0, 200, 240, 0.25) 0%, transparent 40%),
+        radial-gradient(ellipse at 60% 20%, rgba(100, 200, 255, 0.2) 0%, transparent 35%),
+        linear-gradient(180deg, #1a7ab0 0%, #0e4a6e 100%);
+    background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 100% 100%;
+    animation: water-wave 8s ease-in-out infinite;
+}
+
+@keyframes water-wave {
+    0%   { background-position: 0% 0%, 100% 100%, 50% 50%, 30% 70%, 0% 0%; }
+    33%  { background-position: 100% 50%, 0% 30%, 100% 0%, 70% 30%, 0% 0%; }
+    66%  { background-position: 50% 100%, 70% 0%, 0% 100%, 0% 50%, 0% 0%; }
+    100% { background-position: 0% 0%, 100% 100%, 50% 50%, 30% 70%, 0% 0%; }
+}
+
+.game-board-cell {
+    width: 40px;
+    height: 40px;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    cursor: default;
+    transition: background-color 0.15s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.game-board-cell.clickable {
+    cursor: pointer;
+}
+
+.ship-overlay {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    object-fit: fill;
+}

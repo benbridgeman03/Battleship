@@ -3,7 +3,11 @@ import { useGame } from "../../context/GameContext";
 import { useBoardEvents } from "./useBoardEvents";
 import { getCellColor } from "./boardUtils";
 import { handleBoardClick } from "./boardActions";
+import { ShipImageMap } from "../../models/Ship";
 import type { Cell } from "../../models/Cell";
+import "./GameBoard.css";
+
+const CELL_SIZE = 40;
 
 interface GameBoardProps {
     isOpponent: boolean;
@@ -14,30 +18,43 @@ interface GameBoardProps {
 }
 
 function GameBoard({ isOpponent, isSetup = false, cells, setCells, onCellClick }: GameBoardProps) {
-    const { selectedShip, horizontal, showPopup } = useGame();
+    const { selectedShip, horizontal, showPopup, myPlacements } = useGame();
     const [hoveredCell, setHoveredCell] = useState<{ x: number, y: number } | null>(null);
 
     useBoardEvents(isOpponent, setCells, showPopup);
 
+    const placements = isOpponent ? [] : myPlacements;
+
     return (
-        <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(10, 40px)",
-            gap: "2px"
-        }}>
+        <div className="game-board">
+            {placements.map((p, i) => (
+                <img
+                    key={`ship-${i}`}
+                    className="ship-overlay"
+                    src={ShipImageMap[p.shipName]}
+                    alt={p.shipName}
+                    style={{
+                        left: p.startX * CELL_SIZE,
+                        top: p.startY * CELL_SIZE,
+                        width: CELL_SIZE,
+                        height: p.size * CELL_SIZE,
+                        ...(p.horizontal ? {
+                            transformOrigin: "top left",
+                            transform: `translateX(${p.size * CELL_SIZE}px) rotate(90deg)`,
+                        } : {}),
+                    }}
+                />
+            ))}
             {cells.map((row, y) =>
                 row.map((cell, x) => (
                     <div
+                        className={`game-board-cell${(isOpponent || isSetup) ? " clickable" : ""}`}
                         onMouseEnter={() => setHoveredCell({ x, y })}
                         onMouseLeave={() => setHoveredCell(null)}
                         key={`${x}-${y}`}
                         onClick={() => handleBoardClick(x, y, cell, isSetup, isOpponent, showPopup, onCellClick)}
                         style={{
-                            width: 40,
-                            height: 40,
                             backgroundColor: getCellColor(cell, isOpponent, x, y, hoveredCell, isSetup, selectedShip, horizontal),
-                            border: "1px solid #333",
-                            cursor: (isOpponent || isSetup) ? "pointer" : "default"
                         }}
                     />
                 ))
