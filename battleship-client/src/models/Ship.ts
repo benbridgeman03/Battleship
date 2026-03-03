@@ -1,8 +1,8 @@
-import ShipCarrierHull from "../assets/ships/ShipCarrierHull.png";
-import ShipBattleshipHull from "../assets/ships/ShipBattleshipHull.png";
-import ShipCruiserHull from "../assets/ships/ShipCruiserHull.png";
-import ShipSubMarineHull from "../assets/ships/ShipSubMarineHull.png";
-import ShipDestroyerHull from "../assets/ships/ShipDestroyerHull.png";
+import ShipCarrierHull from "../assets/Ships/ShipCarrierHull.png";
+import ShipBattleshipHull from "../assets/Ships/ShipBattleshipHull.png";
+import ShipCruiserHull from "../assets/Ships/ShipCruiserHull.png";
+import ShipSubMarineHull from "../assets/Ships/ShipSubMarineHull.png";
+import ShipDestroyerHull from "../assets/Ships/ShipDestroyerHull.png";
 
 export interface Ship {
     name: "carrier" | "battleship" | "cruiser" | "submarine" | "destroyer";
