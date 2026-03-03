@@ -107,6 +107,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     async function handleLeaveGame() {
         await connection.stop();
         await connection.start();
+        setIsConnected(true);
         resetGame();
         setScreen("lobby");
     }
