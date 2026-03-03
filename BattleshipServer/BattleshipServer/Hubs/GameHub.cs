@@ -20,6 +20,13 @@ namespace BattleshipServer.Hubs
             await Clients.Caller.SendAsync("GameCreated", game.GameId);
         }
 
+        public async Task CancelGame()
+        {
+            var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
+            if (game == null) return;
+            _gameService.EndGame(game);
+        }
+
         public async Task JoinGame(string gameId)
         {
             var game = _gameService.JoinGame(gameId, Context.ConnectionId);
