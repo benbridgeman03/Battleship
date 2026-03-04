@@ -1,8 +1,5 @@
 ﻿using BattleshipServer.Models;
-using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 using System.Collections.Concurrent;
-using System.ComponentModel;
-using System.Text.RegularExpressions;
 
 namespace BattleshipServer.Services
 {
@@ -121,9 +118,23 @@ namespace BattleshipServer.Services
             if (!isHit) SwitchTurn(game);
         }
 
-        public bool CheckShot(Player oppenent, int x, int y)
+        public ShotResult ProcessShot(Shot shot)
         {
-            return oppenent.Board[y, x] != null;
+            var ship = GetShipAt(shot.Opponent, shot.x, shot.y);
+            bool isHit = ship != null;
+
+            if (isHit && ship != null)
+            {
+                HitShip(ship);
+            }
+
+            return new ShotResult
+            {
+                IsHit = isHit,
+                Ship = ship,
+                IsSunk = ship?.IsSunk ?? false,
+                IsGameOver = isHit && shot.Opponent.Ships.All(s => s.IsSunk)
+            };
         }
 
         public void HitShip(Ship ship)

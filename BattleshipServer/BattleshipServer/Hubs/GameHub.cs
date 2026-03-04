@@ -102,37 +102,22 @@ namespace BattleshipServer.Hubs
             var opponent = game.GetOpponent(player);
             if (opponent == null) return;
 
-            var ship = _gameService.GetShipAt(opponent, x, y);
-            bool isHit = ship != null;
-            string? sunkShipName = null;
-            bool isGameOver = false;
+            var shot = new Shot { Game = game, Player = player, Opponent = opponent, x = x, y = y };
+            var result = _gameService.ProcessShot(shot);
 
-            if (isHit && ship != null)
-            {
-                _gameService.HitShip(ship);
-                if (ship.IsSunk)
-                {
-                    sunkShipName = ship.ShipName;
-                    isGameOver = opponent.Ships.All(s => s.IsSunk);
-                }
-            }
+            await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y, result.IsHit, result.Ship?.ShipName, result.IsSunk);
+            await Clients.Client(opponent.ConnectionId!).SendAsync("IncomingShot", x, y, result.IsHit, result.Ship?.ShipName, result.IsSunk);
 
-            string? hitShipName = ship?.ShipName;
-            bool isSunk = ship?.IsSunk ?? false;
-
-            await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y, isHit, hitShipName, isSunk);
-            await Clients.Client(opponent.ConnectionId).SendAsync("IncomingShot", x, y, isHit, hitShipName, isSunk);
-
-            if (isGameOver)
+            if (result.IsGameOver)
             {
                 await Clients.Client(Context.ConnectionId).SendAsync("GameOver", true);
-                await Clients.Client(opponent.ConnectionId).SendAsync("GameOver", false);
+                await Clients.Client(opponent.ConnectionId!).SendAsync("GameOver", false);
                 return;
             }
 
-            _gameService.UpdateTurn(game, isHit);
-            await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", isHit);
-            await Clients.Client(opponent.ConnectionId).SendAsync("TurnUpdate", !isHit);
+            _gameService.UpdateTurn(game, result.IsHit);
+            await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", result.IsHit);
+            await Clients.Client(opponent.ConnectionId!).SendAsync("TurnUpdate", !result.IsHit);
         }
 
         public async Task PlayerPlayAgain()
