@@ -7,7 +7,6 @@
         public bool PlayAgain { get; set; } = false;
         public string?[,] Board { get; set; } = new string?[10, 10];
         public List<Ship>? Ships { get; set; }
-        public bool IsBot { get; set; } = false;
 
         public void ResetPlayer()
         {
