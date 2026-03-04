@@ -7,6 +7,7 @@
         public Player? Player2 { get; set; }
         public string? CurrentTurnConnectionId { get; set; }
         public bool IsBot { get; set; }
+        public Bot? Bot { get; set; }
 
         public bool IsFull => Player1 != null && Player2 != null;
 
