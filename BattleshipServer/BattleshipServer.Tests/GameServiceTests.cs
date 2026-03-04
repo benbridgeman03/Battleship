@@ -169,10 +169,11 @@ public class GameServiceTests
     }
 
     [Fact]
-    public void PlayerShot_ShouldReturnTrue()
+    public void ProcessShot_ShouldReturnHit()
     {
         var service = new GameService();
         var game = service.CreateGame("player1-id");
+        service.JoinGame(game.GameId, "player2-id");
 
         var placements = new List<Ship>
         {
@@ -181,16 +182,18 @@ public class GameServiceTests
 
         service.SetPlayerShips("player1-id", game, placements);
 
-        var isHit = service.CheckShot(game.Player1, 0, 0);
+        var shot = new Shot { Game = game, Player = game.Player2, Opponent = game.Player1, x = 0, y = 0 };
+        var result = service.ProcessShot(shot);
 
-        Assert.True(isHit);
+        Assert.True(result.IsHit);
     }
 
     [Fact]
-    public void CheckShot_ShouldReturnFalse()
+    public void ProcessShot_ShouldReturnMiss()
     {
         var service = new GameService();
         var game = service.CreateGame("player1-id");
+        service.JoinGame(game.GameId, "player2-id");
 
         var placements = new List<Ship>
         {
@@ -199,9 +202,10 @@ public class GameServiceTests
 
         service.SetPlayerShips("player1-id", game, placements);
 
-        var isHit = service.CheckShot(game.Player1, 9, 9);
+        var shot = new Shot { Game = game, Player = game.Player2, Opponent = game.Player1, x = 9, y = 9 };
+        var result = service.ProcessShot(shot);
 
-        Assert.False(isHit);
+        Assert.False(result.IsHit);
     }
 
     [Fact]
