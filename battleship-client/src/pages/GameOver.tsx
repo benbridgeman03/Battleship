@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useGame } from "../context/GameContext";
 
 function GameOver() {
-    const { connection, isWinner, setScreen, resetGame } = useGame();
+    const { connection, isWinner, handleLeaveGame } = useGame();
     const [playAgain, setPlayAgain] = useState(false);
     const [voteCount, setVoteCount] = useState(0);
 
@@ -19,10 +19,7 @@ function GameOver() {
     }
 
     async function handleLeave() {
-        resetGame();
-        await connection.stop();
-        await connection.start();
-        setScreen("lobby");
+        await handleLeaveGame();
     }
 
     return (

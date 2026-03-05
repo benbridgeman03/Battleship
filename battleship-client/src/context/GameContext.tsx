@@ -38,6 +38,7 @@ interface GameContextType {
     showConfirm: (opts: { text?: string; highlight?: string; color?: string; onConfirm: () => void }) => void;
     closePopup: () => void;
     handleLeaveGamePopup: () => void;
+    handleLeaveGame: () => Promise<void>;
     resetGame: () => void;
     isWinner?: boolean;
 }
@@ -188,7 +189,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             myPlacements, setMyPlacements,
             connection, isConnected,
             popup, showPopup, showAlert, showConfirm, closePopup, resetGame,
-            handleLeaveGamePopup, 
+            handleLeaveGamePopup, handleLeaveGame,
             isWinner,
         }}>
             {children}
