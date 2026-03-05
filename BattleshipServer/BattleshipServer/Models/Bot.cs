@@ -12,7 +12,6 @@ namespace BattleshipServer.Models
         public (int row, int col) GetNextShot()
         {
             var shot = Strategy.GetNextShot();
-            //ShotsTaken.Add(shot);
             return shot;
         }
 

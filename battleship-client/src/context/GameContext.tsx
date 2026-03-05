@@ -40,6 +40,8 @@ interface GameContextType {
     handleLeaveGamePopup: () => void;
     resetGame: () => void;
     isWinner?: boolean;
+    isBot: boolean;
+    setIsBot: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -60,6 +62,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const [popup, setPopup] = useState<PopupState | null>(null);
     const [isWinner, setIsWinner] = useState<boolean | undefined>(undefined);
     const [isConnected, setIsConnected] = useState(false);
+    const [isBot, setIsBot] = useState(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [myBoard, setMyBoard] = useState<Cell[][]>(
@@ -190,6 +193,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             popup, showPopup, showAlert, showConfirm, closePopup, resetGame,
             handleLeaveGamePopup, 
             isWinner,
+            isBot, setIsBot
         }}>
             {children}
         </GameContext.Provider>
