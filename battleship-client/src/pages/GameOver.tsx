@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useGame } from "../context/GameContext";
 
 function GameOver() {
-    const { connection, isWinner, handleLeaveGame } = useGame();
+    const { connection, isWinner, isBot , handleLeaveGame} = useGame();
     const [playAgain, setPlayAgain] = useState(false);
     const [voteCount, setVoteCount] = useState(0);
 
@@ -38,7 +38,10 @@ function GameOver() {
                         onClick={handlePlayAgain}
                         disabled={playAgain}
                     >
-                        {playAgain ? `Waiting... (${voteCount}/2)` : `Play Again (${voteCount}/2)`}
+                        {playAgain
+                            ? (isBot ? "Waiting..." : `Waiting... (${voteCount}/2)`)
+                            : (isBot ? "Play Again" : `Play Again (${voteCount}/2)`)
+                        }
                     </button>
                     <button onClick={handleLeave}>Leave</button>
                 </div>

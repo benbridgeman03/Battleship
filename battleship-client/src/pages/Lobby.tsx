@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useGame } from "../context/GameContext";
 
 function Lobby() {
-    const { connection } = useGame();
+    const { connection, setIsBot } = useGame();
     const [gameId, setGameId] = useState("");
     const [joinCode, setJoinCode] = useState("");
     const [isCreatingGame, setIsCreatingGame] = useState(false);
@@ -16,11 +16,12 @@ function Lobby() {
     }, [connection]);
 
     function handleCreateGame() {
+        const isBot = false;
         setIsCreatingGame(prev => {
             const newValue = !prev;
 
             if (newValue) {
-                connection.invoke("CreateGame");
+                connection.invoke("CreateGame", isBot);
             }else{
                 connection.invoke("CancelGame");
             }
@@ -28,6 +29,12 @@ function Lobby() {
             return newValue;
         });
     }
+
+  function handleBotGame(){
+      const isBot = true;
+      setIsBot(true);
+      connection.invoke("CreateGame", isBot);
+  }
 
     return (
         <div className="page">
@@ -47,6 +54,11 @@ function Lobby() {
                                 <div className="lobby-waiting">Waiting for opponent...</div>
                             </>
                         )}
+                         {!isCreatingGame && (
+                                    <button className="btn-primary" onClick={handleBotGame}>
+                                            Play vs Bot
+                                    </button>
+                         )}
                     </div>
                     
                     {!isCreatingGame && (

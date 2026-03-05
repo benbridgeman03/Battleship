@@ -13,11 +13,12 @@ namespace BattleshipServer.Hubs
             _gameService = gameService;
         }
 
-        public async Task CreateGame()
+        public async Task CreateGame(bool isBot)
         {
-            var game = _gameService.CreateGame(Context.ConnectionId);
+            var game = _gameService.CreateGame(Context.ConnectionId, isBot);
             await Groups.AddToGroupAsync(Context.ConnectionId, game.GameId);
-            await Clients.Caller.SendAsync("GameCreated", game.GameId);
+            if(!isBot) await Clients.Caller.SendAsync("GameCreated", game.GameId);
+            else await Clients.Caller.SendAsync("GameStarted", game.GameId);
         }
 
         public async Task CancelGame()
@@ -106,24 +107,55 @@ namespace BattleshipServer.Hubs
             var result = _gameService.ProcessShot(shot);
 
             await Clients.Client(Context.ConnectionId).SendAsync("ShotFired", x, y, result.IsHit, result.Ship?.ShipName, result.IsSunk);
-            await Clients.Client(opponent.ConnectionId!).SendAsync("IncomingShot", x, y, result.IsHit, result.Ship?.ShipName, result.IsSunk);
+            if(opponent.isBot == false) await Clients.Client(opponent.ConnectionId!).SendAsync("IncomingShot", x, y, result.IsHit, result.Ship?.ShipName, result.IsSunk);
 
             if (result.IsGameOver)
             {
                 await Clients.Client(Context.ConnectionId).SendAsync("GameOver", true);
-                await Clients.Client(opponent.ConnectionId!).SendAsync("GameOver", false);
+                if (opponent.isBot == false) await Clients.Client(opponent.ConnectionId!).SendAsync("GameOver", false);
                 return;
             }
 
-            _gameService.UpdateTurn(game, result.IsHit);
-            await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", result.IsHit);
-            await Clients.Client(opponent.ConnectionId!).SendAsync("TurnUpdate", !result.IsHit);
+            if (!result.IsHit && opponent.isBot && opponent.bot != null)
+            {
+                await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", false);
+
+                while (true)
+                {
+                    await Task.Delay(1700);
+                    var (row, col) = opponent.bot.GetNextShot();
+                    var botShot = new Shot { Game = game, Player = opponent, Opponent = player, x = col, y = row };
+                    var botResult = _gameService.ProcessShot(botShot);
+
+                    opponent.bot.RecordResult(row, col, botResult.IsHit, botResult.Ship?.Size ?? 0, botResult.IsSunk, botResult.Ship?.ShipName);
+
+                    await Clients.Client(Context.ConnectionId).SendAsync("IncomingShot", col, row, botResult.IsHit, botResult.Ship?.ShipName, botResult.IsSunk);
+
+                    if (botResult.IsGameOver)
+                    {
+                        await Clients.Client(Context.ConnectionId).SendAsync("GameOver", false);
+                        return;
+                    }
+
+                    if (!botResult.IsHit) break;
+                }
+
+                await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", true);
+            }
+            else
+            {
+                _gameService.UpdateTurn(game, result.IsHit);
+                await Clients.Client(Context.ConnectionId).SendAsync("TurnUpdate", result.IsHit);
+                if (opponent.isBot == false) await Clients.Client(opponent.ConnectionId!).SendAsync("TurnUpdate", !result.IsHit);
+            }
         }
 
         public async Task PlayerPlayAgain()
         {
             var game = _gameService.GetGameByConnectionId(Context.ConnectionId);
             if (game == null) return;
+
+            if(game.Player2.isBot) await Clients.Client(game.Player1.ConnectionId).SendAsync("PlayAgain");
 
             _gameService.SetPlayerPlayAgain(Context.ConnectionId, game);
 
