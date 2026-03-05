@@ -10,7 +10,7 @@ public class GameServiceTests
     public void CreateGame_ShouldAddPlayer1()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
 
         Assert.NotNull(game.Player1);
         Assert.Equal("player1-id", game.Player1.ConnectionId);
@@ -20,7 +20,7 @@ public class GameServiceTests
     public void CreateGame_ShouldAddPlayer2()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         Assert.NotNull(game.Player1);
@@ -34,7 +34,7 @@ public class GameServiceTests
     {
         var service = new GameService();
         var player1Id = "player1-id";
-        var newGame = service.CreateGame(player1Id);
+        var newGame = service.CreateGame(player1Id, false);
 
         var game = service.GetGameByConnectionId(player1Id);
 
@@ -53,7 +53,7 @@ public class GameServiceTests
     public void SetPlayerReady_ShouldReturnTrue()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         service.SetPlayerReady("player1-id", game);
@@ -65,7 +65,7 @@ public class GameServiceTests
     public void SetPlayerReady_ShouldNotAffectOtherPlayer()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
         service.SetPlayerReady("player1-id", game);
 
@@ -77,7 +77,7 @@ public class GameServiceTests
     public void BothPlayersReady_ShouldReturnTrue_WhenBothReady()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
         service.SetPlayerReady("player1-id", game);
         service.SetPlayerReady("player2-id", game);
@@ -89,7 +89,7 @@ public class GameServiceTests
     public void SetPlayerShips_ShouldPlaceHorizontalShip()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
     {
         new Ship
@@ -116,7 +116,7 @@ public class GameServiceTests
     public void SetPlayerShips_ShouldPlaceVerticalShip()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
     {
         new Ship
@@ -140,7 +140,7 @@ public class GameServiceTests
     public void SetPlayerShips_ShouldPlaceMultipleShips()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
     {
         new Ship { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 },
@@ -157,7 +157,7 @@ public class GameServiceTests
     public void SetPlayerShips_ShouldDoNothing_WhenPlayerNotFound()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
         {
             new Ship { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 }
@@ -172,7 +172,7 @@ public class GameServiceTests
     public void ProcessShot_ShouldReturnHit()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         var placements = new List<Ship>
@@ -192,7 +192,7 @@ public class GameServiceTests
     public void ProcessShot_ShouldReturnMiss()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         var placements = new List<Ship>
@@ -212,7 +212,7 @@ public class GameServiceTests
     public void SetPlayerShips_OverlappingShips_LastShipOverwrites()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
         {
             new Ship { ShipName = "carrier", StartX = 0, StartY = 0, Horizontal = true, Size = 5 },
@@ -232,7 +232,7 @@ public class GameServiceTests
     public void SetPlayerShips_HorizontalShipOutOfBounds_ShouldThrow()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
         {
             new Ship { ShipName = "carrier", StartX = 8, StartY = 0, Horizontal = true, Size = 5 }
@@ -246,7 +246,7 @@ public class GameServiceTests
     public void SetPlayerShips_VerticalShipOutOfBounds_ShouldThrow()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
         {
             new Ship { ShipName = "carrier", StartX = 0, StartY = 8, Horizontal = false, Size = 5 }
@@ -260,7 +260,7 @@ public class GameServiceTests
     public void SetPlayerShips_AtBoardEdge_Horizontal_ShouldSucceed()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
         {
             new Ship { ShipName = "carrier", StartX = 5, StartY = 0, Horizontal = true, Size = 5 }
@@ -275,7 +275,7 @@ public class GameServiceTests
     public void SetPlayerShips_AtBoardEdge_Vertical_ShouldSucceed()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
         {
             new Ship { ShipName = "carrier", StartX = 0, StartY = 5, Horizontal = false, Size = 5 }
@@ -314,7 +314,7 @@ public class GameServiceTests
     public void GetShipAt_ShouldReturnShip_WhenHit()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
         {
             new Ship { ShipName = "destroyer", StartX = 3, StartY = 4, Horizontal = true, Size = 2 }
@@ -331,7 +331,7 @@ public class GameServiceTests
     public void GetShipAt_ShouldReturnNull_WhenMiss()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
         {
             new Ship { ShipName = "destroyer", StartX = 3, StartY = 4, Horizontal = true, Size = 2 }
@@ -347,7 +347,7 @@ public class GameServiceTests
     public void AllShipsSunk_ShouldBeTrue_WhenAllHit()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         var placements = new List<Ship>
         {
             new Ship { ShipName = "destroyer", StartX = 0, StartY = 0, Horizontal = true, Size = 2 }
@@ -367,7 +367,7 @@ public class GameServiceTests
     public void SwitchTurn_ShouldAlternateBetweenPlayers()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         Assert.Equal("player1-id", game.CurrentTurnConnectionId);
@@ -383,7 +383,7 @@ public class GameServiceTests
     public void UpdateTurn_ShouldSwitchOnMiss()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         service.UpdateTurn(game, isHit: false);
@@ -395,7 +395,7 @@ public class GameServiceTests
     public void UpdateTurn_ShouldNotSwitchOnHit()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         service.UpdateTurn(game, isHit: true);
@@ -407,7 +407,7 @@ public class GameServiceTests
     public void JoinGame_ShouldReturnNull_WhenGameIsFull()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         var result = service.JoinGame(game.GameId, "player3-id");
@@ -429,7 +429,7 @@ public class GameServiceTests
     public void EndGame_ShouldRemoveGameFromService()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
 
         service.EndGame(game);
 
@@ -440,7 +440,7 @@ public class GameServiceTests
     public void SetPlayerPlayAgain_ShouldSetFlag()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         service.SetPlayerPlayAgain("player1-id", game);
@@ -453,7 +453,7 @@ public class GameServiceTests
     public void BothPlayersPlayAgain_ShouldReturnTrue_WhenBothSet()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         service.SetPlayerPlayAgain("player1-id", game);
@@ -466,7 +466,7 @@ public class GameServiceTests
     public void BothPlayersPlayAgain_ShouldReturnFalse_WhenOnlyOneSet()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         service.SetPlayerPlayAgain("player1-id", game);
@@ -478,7 +478,7 @@ public class GameServiceTests
     public void RestartGame_ShouldResetBothPlayers()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         var placements = new List<Ship>
@@ -503,7 +503,7 @@ public class GameServiceTests
     public void RestartGame_ShouldResetTurnToPlayer1()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.JoinGame(game.GameId, "player2-id");
 
         service.SwitchTurn(game);
@@ -518,7 +518,7 @@ public class GameServiceTests
     public void SetPlayerUnready_ShouldClearReadyFlag()
     {
         var service = new GameService();
-        var game = service.CreateGame("player1-id");
+        var game = service.CreateGame("player1-id", false);
         service.SetPlayerReady("player1-id", game);
 
         Assert.True(game.Player1.IsReady);
