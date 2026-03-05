@@ -16,9 +16,9 @@ namespace BattleshipServer.Models
             return shot;
         }
 
-        public void RecordResult(int row, int col, bool isHit, bool isSunk)
+        public void RecordResult(int row, int col, bool isHit, int shipSize, bool isSunk, string? shipName)
         {
-            Strategy.RecordResult(row, col, isHit, isSunk);
+            Strategy.RecordResult(row, col, isHit, shipSize, isSunk, shipName);
         }
     }
 }

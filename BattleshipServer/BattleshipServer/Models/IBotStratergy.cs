@@ -3,6 +3,6 @@
     public interface IBotStrategy
     {
         (int row, int col) GetNextShot();
-        public void RecordResult(int row, int col, bool isHit, int shipSize, bool isSunk);
+        public void RecordResult(int row, int col, bool isHit, int shipSize, bool isSunk, string? shipName);
     }
 }
