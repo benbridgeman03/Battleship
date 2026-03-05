@@ -8,7 +8,7 @@ namespace BattleshipServer.Services
 
         private readonly ConcurrentDictionary<string, Game> _games = new();
 
-        public Game CreateGame(string playerConnectionId)
+        public Game CreateGame(string playerConnectionId, bool isBot)
         {
             var game = new Game
             {
@@ -17,6 +17,11 @@ namespace BattleshipServer.Services
             };
             game.AddPlayer(playerConnectionId);
             _games[game.GameId] = game;
+            if (isBot)
+            {
+                game.AddPlayer("bot");
+                game.Player2.SetupBot();
+            }
             return game;
         }
 
