@@ -85,15 +85,6 @@ namespace BattleshipServer.Models
                 }
             }
 
-            foreach(var miss in ShotsMissed)
-            {
-                _combinedHeatmap[miss.row, miss.col] = 0;
-            }
-            foreach(var hit in ShotsHit)
-            {
-                _combinedHeatmap[hit.Key.row, hit.Key.col] = 0;
-            }
-
             int[][] directions = { new[] { -1, 0 }, new[] { 1, 0 }, new[] { 0, -1 }, new[] { 0, 1 } };
 
             foreach (var hit in ShotsHit)
@@ -107,16 +98,26 @@ namespace BattleshipServer.Models
 
                     if (r < 0 || r >= 10 || c < 0 || c >= 10) continue;
 
-                    _combinedHeatmap[r, c] *= 2;
+                    _combinedHeatmap[r, c] += 20;
 
-                    if (ShotsHit.TryGetValue((r, c), out var adjShipName) && adjShipName == hit.Value)
+                    int br = hit.Key.row - dir[0];
+                    int bc = hit.Key.col - dir[1];
+                    if (br >= 0 && br < 10 && bc >= 0 && bc < 10
+                        && ShotsHit.TryGetValue((br, bc), out var behindShipName)
+                        && behindShipName == hit.Value)
                     {
-                        int nr = r + dir[0];
-                        int nc = c + dir[1];
-                        if (nr >= 0 && nr < 10 && nc >= 0 && nc < 10)
-                            _combinedHeatmap[nr, nc] *= 3;
+                        _combinedHeatmap[r, c] += 40;
                     }
                 }
+            }
+
+            foreach (var miss in ShotsMissed)
+            {
+                _combinedHeatmap[miss.row, miss.col] = 0;
+            }
+            foreach (var hit in ShotsHit)
+            {
+                _combinedHeatmap[hit.Key.row, hit.Key.col] = 0;
             }
 
             float max = 0;
