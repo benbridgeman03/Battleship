@@ -17,8 +17,12 @@ namespace BattleshipServer.Hubs
         {
             var game = _gameService.CreateGame(Context.ConnectionId, isBot);
             await Groups.AddToGroupAsync(Context.ConnectionId, game.GameId);
-            if(!isBot) await Clients.Caller.SendAsync("GameCreated", game.GameId);
-            else await Clients.Caller.SendAsync("GameStarted", game.GameId);
+            if (!isBot) await Clients.Caller.SendAsync("GameCreated", game.GameId);
+            else
+            {
+                await Clients.Caller.SendAsync("GameStarted");
+                await Clients.Caller.SendAsync("TurnUpdate", true);
+            }
         }
 
         public async Task CancelGame()
